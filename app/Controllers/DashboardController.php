@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+<<<<<<< HEAD
 use App\Models\SaldoCutiModel;
 use App\Models\PengajuanCutiModel;
 
@@ -14,10 +15,25 @@ class DashboardController extends BaseController
     {
         $this->saldoModel = new SaldoCutiModel();
         $this->pengajuanModel = new PengajuanCutiModel();
+=======
+use App\Models\LaporanModel;
+use App\Models\UserModel;
+
+class DashboardController extends BaseController
+{
+    protected $userModel;
+    protected $laporanModel;
+
+    public function __construct()
+    {
+        $this->userModel = new UserModel();
+        $this->laporanModel = new LaporanModel();
+>>>>>>> affbd2d3d63a4f9f5f53a92a1110c45dbd3682db
     }
 
     public function index()
     {
+<<<<<<< HEAD
         // sementara hardcode
         $userId = 1;
 
@@ -64,3 +80,16 @@ class DashboardController extends BaseController
        return view('pegawai/dashboard/index', $data);
     }
 }
+=======
+        $data = [
+            'title' => 'Dashboard',
+            'totalPegawai' => $this->userModel->countPegawai(),
+            'totalLaporan' => $this->laporanModel->countLaporan(),
+            'cutiBulanIni' => $this->laporanModel->countCutiThisMonth(),
+            'recentLaporan' => $this->laporanModel->getRecentLaporan(5),
+        ];
+
+        return view('Dashboard/index', $data);
+    }
+}
+>>>>>>> affbd2d3d63a4f9f5f53a92a1110c45dbd3682db

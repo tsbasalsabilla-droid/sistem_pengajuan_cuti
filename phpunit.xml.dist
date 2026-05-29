@@ -2,7 +2,11 @@
 <phpunit
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+<<<<<<< HEAD
     bootstrap="system/Test/bootstrap.php"
+=======
+    bootstrap="vendor/codeigniter4/framework/system/Test/bootstrap.php"
+>>>>>>> affbd2d3d63a4f9f5f53a92a1110c45dbd3682db
     backupGlobals="false"
     beStrictAboutOutputDuringTests="true"
     colors="true"
