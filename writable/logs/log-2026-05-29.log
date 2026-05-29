@@ -1,0 +1,22 @@
+CRITICAL - 2026-05-29 02:01:50 --> ErrorException: Maximum execution time of 60 seconds exceeded
+【Previous Exception】
+CodeIgniter\Exceptions\PageNotFoundException
+Can't find a route for 'GET: cuti'.
+#0 C:\xampp\htdocs\cuti\system\CodeIgniter.php(1001): CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound('Can't find a ro...')
+#1 C:\xampp\htdocs\cuti\system\CodeIgniter.php(346): CodeIgniter\CodeIgniter->display404errors(Object(CodeIgniter\Exceptions\PageNotFoundException))
+#2 C:\xampp\htdocs\cuti\system\Boot.php(417): CodeIgniter\CodeIgniter->run()
+#3 C:\xampp\htdocs\cuti\system\Boot.php(68): CodeIgniter\Boot::runCodeIgniter(Object(CodeIgniter\CodeIgniter))
+#4 C:\xampp\htdocs\cuti\public\index.php(59): CodeIgniter\Boot::bootWeb(Object(Config\Paths))
+#5 C:\xampp\htdocs\cuti\system\rewrite.php(44): require_once('C:\\xampp\\htdocs...')
+#6 {main}
+[Method: GET, Route: cuti]
+in APPPATH\Views\errors\html\error_404.php on line 1.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2026-05-29 02:04:29 --> ErrorException: Maximum execution time of 60 seconds exceeded
+[Method: GET, Route: pegawai/dashboard]
+in SYSTEMPATH\Database\MySQLi\Builder.php on line 23.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
+CRITICAL - 2026-05-29 02:07:54 --> ErrorException: Maximum execution time of 60 seconds exceeded
+[Method: GET, Route: pegawai/dashboard]
+in SYSTEMPATH\ThirdParty\Kint\Parser\DomPlugin.php on line 60.
+ 1 [internal function]: CodeIgniter\Debug\Exceptions->shutdownHandler()
