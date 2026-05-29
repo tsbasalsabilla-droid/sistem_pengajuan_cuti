@@ -178,6 +178,7 @@ class Database extends Config
         'encrypt'     => false,
         'compress'    => false,
         'strictOn'    => false,
+        'strictOn'    => true,
         'failover'    => [],
         'port'        => 3306,
         'foreignKeys' => true,

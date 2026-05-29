@@ -48,6 +48,7 @@ Vagrantfile
 #-------------------------
 # Temporary Files
 #-------------------------
+
 writable/cache/*
 !writable/cache/index.html
 
@@ -62,24 +63,50 @@ writable/uploads/*
 
 writable/debugbar/*
 !writable/debugbar/index.html
+/writable/cache/*
+!/writable/cache/index.html
+
+/writable/logs/*
+!/writable/logs/index.html
+
+/writable/session/*
+!/writable/session/index.html
+
+/writable/uploads/*
+!/writable/uploads/index.html
+
+/writable/debugbar/*
+!/writable/debugbar/index.html
+>>>>>>> affbd2d3d63a4f9f5f53a92a1110c45dbd3682db
 
 php_errors.log
 
 #-------------------------
 # User Guide Temp Files
 #-------------------------
+<<<<<<< HEAD
 user_guide_src/build/*
 user_guide_src/cilexer/build/*
 user_guide_src/cilexer/dist/*
 user_guide_src/cilexer/pycilexer.egg-info/*
+/user_guide_src/build/*
+/user_guide_src/cilexer/build/*
+/user_guide_src/cilexer/dist/*
+/user_guide_src/cilexer/pycilexer.egg-info/*
 
 #-------------------------
 # Test Files
 #-------------------------
+<<<<<<< HEAD
 tests/coverage*
 
 # Don't save phpunit under version control.
 phpunit
+=======
+/tests/coverage*
+
+# Don't save phpunit under version control.
+/phpunit
 
 #-------------------------
 # Composer

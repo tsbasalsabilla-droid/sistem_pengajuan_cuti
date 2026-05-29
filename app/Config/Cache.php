@@ -3,6 +3,7 @@
 namespace Config;
 
 use CodeIgniter\Cache\CacheInterface;
+use CodeIgniter\Cache\Handlers\ApcuHandler;
 use CodeIgniter\Cache\Handlers\DummyHandler;
 use CodeIgniter\Cache\Handlers\FileHandler;
 use CodeIgniter\Cache\Handlers\MemcachedHandler;
@@ -119,7 +120,7 @@ class Cache extends BaseConfig
         'password' => null,
         'port'     => 6379,
         'timeout'  => 0,
-        'database' => 0,
+        'database' => 0
     ];
 
     /**

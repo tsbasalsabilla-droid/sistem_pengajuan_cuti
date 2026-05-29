@@ -22,41 +22,58 @@ class Auth extends BaseController
     // Proses login
     public function doLogin()
     {
+        $rules = [
+            'nip' => 'required',
+            'password' => 'required'
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'NIP dan password wajib diisi.');
+        }
+
         $nip = $this->request->getPost('nip');
         $password = $this->request->getPost('password');
 
         $user = $this->pegawaiModel->where('nip', $nip)->first();
 
-        if ($user && password_verify($password, $user['password'])) {
-            // Simpan user ke session
-            $this->session->set('user', [
-                'id' => $user['id'],
-                'nama' => $user['nama'],
-                'email' => $user['email'],
-                'nip' => $user['nip'],
-                'role' => $user['role']
-            ]);
-
-            // Redirect berdasarkan role
-            switch ($user['role']) {
-                case 'spv':
-                    $redirectTo = '/spv/dashboard';
-                    break;
-                case 'hrd':
-                    $redirectTo = '/hrd';
-                    break;
-                case 'direktur':
-                    $redirectTo = '/direktur/dashboard';
-                    break;
-                default:
-                    $redirectTo = '/cuti';
-                    break;
-            }
-
-            return redirect()->to($redirectTo)->with('success', 'Login berhasil!');
+        if (!$user || !password_verify($password, $user['password'])) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'NIP atau password salah.');
         }
 
-        return redirect()->back()->with('error', 'Email atau password salah!');
+        if (isset($user['status_aktif']) && $user['status_aktif'] !== 'aktif') {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Akun Anda tidak aktif. Hubungi administrator.');
+        }
+
+        $this->session->set('user', [
+            'id' => $user['id'],
+            'nama' => $user['nama'],
+            'email' => $user['email'],
+            'nip' => $user['nip'],
+            'role' => $user['role'],
+        ]);
+
+        switch ($user['role']) {
+            case 'spv':
+                $redirectTo = '/spv/dashboard';
+                break;
+            case 'hrd':
+                $redirectTo = '/hrd';
+                break;
+            case 'direktur':
+                $redirectTo = '/direktur/dashboard';
+                break;
+            default:
+                $redirectTo = '/cuti';
+                break;
+        }
+
+        return redirect()->to($redirectTo)->with('success', 'Login berhasil!');
     }
 
     // Logout
@@ -66,7 +83,7 @@ class Auth extends BaseController
         return redirect()->to('/auth/login')->with('success', 'Logout berhasil!');
     }
 
-    // Register (optional)
+    // Form register
     public function register()
     {
         return view('auth/register');
@@ -75,16 +92,40 @@ class Auth extends BaseController
     // Proses register
     public function doRegister()
     {
-        $data = [
+        $rules = [
+            'nama' => 'required',
+            'email' => 'required|valid_email|is_unique[pegawai.email]',
+            'nip' => 'required|is_unique[pegawai.nip]',
+            'password' => 'required|min_length[8]'
+        ];
+
+        $messages = [
+            'email' => [
+                'is_unique' => 'Email sudah terdaftar.',
+                'valid_email' => 'Format email tidak valid.',
+            ],
+            'nip' => [
+                'is_unique' => 'NIP sudah terdaftar.',
+            ],
+            'password' => [
+                'min_length' => 'Password minimal 8 karakter.',
+            ],
+        ];
+
+        if (!$this->validate($rules, $messages)) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', implode(' ', $this->validator->getErrors()));
+        }
+
+        $this->pegawaiModel->save([
             'nama' => $this->request->getPost('nama'),
             'email' => $this->request->getPost('email'),
             'nip' => $this->request->getPost('nip'),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role' => $this->request->getPost('role') ?? 'karyawan',
-            'status_aktif' => 'aktif'
-        ];
-
-        $this->pegawaiModel->save($data);
+            'role' => 'karyawan',
+            'status_aktif' => 'aktif',
+        ]);
 
         return redirect()->to('/auth/login')->with('success', 'Registrasi berhasil! Silakan login.');
     }
