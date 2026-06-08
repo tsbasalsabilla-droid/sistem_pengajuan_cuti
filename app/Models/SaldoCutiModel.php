@@ -9,7 +9,7 @@ class SaldoCutiModel extends Model
     protected $table = 'saldo_cuti';
 
     protected $allowedFields = [
-        'user_id',
+        'pegawai_id',
         'tahun',
         'total_cuti',
         'cuti_terpakai',

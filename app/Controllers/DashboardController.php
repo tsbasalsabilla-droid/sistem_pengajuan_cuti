@@ -24,7 +24,7 @@ class DashboardController extends BaseController
         // SALDO CUTI
         
         $saldo = $this->saldoModel
-            ->where('user_id', $userId)
+            ->where('pegawai_id', $userId)
             ->first();
 
         // PENGAJUAN TERAKHIR

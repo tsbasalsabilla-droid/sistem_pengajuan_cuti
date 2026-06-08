@@ -246,7 +246,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Nama Pegawai</th>
+                                <th>Pegawai ID</th>
                                 <th>Periode Cuti</th>
                                 <th>Total Hari</th>
                                 <th>Alasan</th>

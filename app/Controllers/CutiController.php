@@ -52,7 +52,7 @@ class CutiController extends BaseController
         $userId = 1;
 
         $saldo = $this->saldoModel
-            ->where('user_id', $userId)
+            ->where('pegawai_id', $userId)
             ->first();
 
         if (!$saldo || $saldo['sisa_cuti'] < $totalHari) {
@@ -107,7 +107,7 @@ class CutiController extends BaseController
         if ($role == 'direktur') {
             $nextStatus = 'approve';
             $saldo = $this->saldoModel
-                ->where('user_id', $cuti['pegawai_id'])
+                ->where('pegawai_id', $cuti['pegawai_id'])
                 ->first();
 
             if ($saldo) {

@@ -51,7 +51,7 @@ class CutiHrdController extends BaseController
         $totalHari = (($selesai - $mulai) / 86400) + 1;
 
         $saldo = $this->saldoModel
-            ->where('user_id', $userId)
+            ->where('pegawai_id', $userId)
             ->first();
 
         if (!$saldo) {

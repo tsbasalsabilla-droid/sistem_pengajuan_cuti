@@ -33,7 +33,7 @@ class DashboardHrdController extends BaseController
         $userId = 2;
 
         $saldo = $this->saldoModel
-            ->where('user_id', $userId)
+            ->where('pegawai_id', $userId)
             ->first();
 
         $pengajuanTerakhir = $this->pengajuanModel
