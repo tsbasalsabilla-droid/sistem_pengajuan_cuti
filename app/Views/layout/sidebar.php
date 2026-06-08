@@ -5,22 +5,23 @@
         box-sizing: border-box;
     }
 
-    body {
-        background: #f8f3ed;
-        font-family: 'Segoe UI', sans-serif;
-    }
-
-
-    .sidebar {
+        .sidebar {
         width: 260px;
         height: 100vh;
         background: linear-gradient(180deg, #6f4e37, #8b6b52);
         position: fixed;
         left: 0;
         top: 0;
-        padding: 25px 18px;
+        padding: 20px 18px;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
+    
     }
+
+    body {
+        background: #f8f3ed;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
 
     .logo {
         text-align: center;
@@ -68,7 +69,7 @@
         gap: 14px;
         color: #f8ede3;
         text-decoration: none;
-        padding: 14px 18px;
+        padding: 8px 18px;
         margin-bottom: 10px;
         border-radius: 16px;
         transition: 0.3s;
@@ -173,60 +174,55 @@
         Main Menu
     </div>
 
-    <?php 
-        $userRole = session()->get('user')['role'] ?? 'karyawan';
-        $currentUrl = current_url(true)->getPath();
-    ?>
+    <?php
+$userRole = session()->get('user')['role'] ?? 'karyawan';
+$currentUrl = current_url(true)->getPath();
+?>
 
-    <?php if(in_array($userRole, ['karyawan'])): ?>
-        <a href="/cuti" class="<?= str_contains($currentUrl, '/cuti') ? 'active' : ''; ?>">
-            <i class="bi bi-file-earmark-plus"></i>
-            Pengajuan Cuti
-        </a>
+<?php if ($userRole == 'spv'): ?>
 
-        <a href="/cuti/history" class="<?= str_contains($currentUrl, 'history') ? 'active' : ''; ?>">
-            <i class="bi bi-clock-history"></i>
-            History Pengajuan
-        </a>
-    <?php endif; ?>
+    <a href="/spv/dashboard"
+   class="<?= str_contains($currentUrl, 'spv/dashboard') ? 'active' : ''; ?>">
+    <i class="bi bi-speedometer2"></i>
+    Dashboard
+</a>
 
-    <?php if(in_array($userRole, ['spv'])): ?>
-        <a href="/spv/dashboard" class="<?= str_contains($currentUrl, '/spv/dashboard') ? 'active' : ''; ?>">
-            <i class="bi bi-speedometer2"></i>
-            Dashboard
-        </a>
+<a href="/spv/cuti/create"
+   class="<?= str_contains($currentUrl, 'spv/cuti/create') ? 'active' : ''; ?>">
+    <i class="bi bi-file-earmark-plus"></i>
+    Pengajuan Cuti
+</a>
 
-        <a href="/spv" class="<?= str_contains($currentUrl, '/spv') && !str_contains($currentUrl, '/spv/dashboard') ? 'active' : ''; ?>">
-            <i class="bi bi-person-check"></i>
-            Approval SPV
-        </a>
-    <?php endif; ?>
+<a href="/spv/cuti"
+   class="<?= str_contains($currentUrl, 'spv/cuti') ? 'active' : ''; ?>">
+    <i class="bi bi-clock-history"></i>
+    History Pengajuan
+</a>
 
-    <?php if(in_array($userRole, ['teman', 'karyawan'])): ?>
-        <a href="/teman" class="<?= str_contains($currentUrl, '/teman') ? 'active' : ''; ?>">
-            <i class="bi bi-people"></i>
-            Approval Teman
-        </a>
-    <?php endif; ?>
+<a href="/approvalspv"
+   class="<?= str_contains($currentUrl, 'approvalspv') ? 'active' : ''; ?>">
+    <i class="bi bi-building-check"></i>
+    Approval
+</a>
 
-    <?php if(in_array($userRole, ['hrd'])): ?>
-        <a href="/hrd" class="<?= str_contains($currentUrl, '/hrd') ? 'active' : ''; ?>">
-            <i class="bi bi-person-workspace"></i>
-            Approval HRD
-        </a>
-    <?php endif; ?>
+<?php endif; ?>
 
-    <?php if(in_array($userRole, ['direktur'])): ?>
-        <a href="/direktur/dashboard" class="<?= str_contains($currentUrl, '/direktur/dashboard') ? 'active' : ''; ?>">
-            <i class="bi bi-speedometer2"></i>
-            Dashboard
-        </a>
+<!-- DIREKTUR -->
+<?php if ($userRole == 'direktur'): ?>
 
-        <a href="/direktur" class="<?= str_contains($currentUrl, '/direktur') && !str_contains($currentUrl, '/direktur/dashboard') ? 'active' : ''; ?>">
-            <i class="bi bi-building-check"></i>
-            Approval Direktur
-        </a>
-    <?php endif; ?>
+    <a href="/direktur/dashboard"
+   class="<?= str_contains($currentUrl, 'direktur/dashboard') ? 'active' : ''; ?>">
+    <i class="bi bi-speedometer2"></i>
+    Dashboard
+</a>
+
+<a href="/direktur"
+   class="<?= $currentUrl == 'direktur' ? 'active' : ''; ?>">
+    <i class="bi bi-building-check"></i>
+    Approval
+</a>
+
+<?php endif; ?>
 
     <div class="menu-title" style="margin-top: 30px;">
         User

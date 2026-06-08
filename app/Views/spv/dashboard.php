@@ -1,34 +1,26 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard SPV</title>
-
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
     <style>
-        body {
-            background: #f6f1eb;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-        }
-
-        /* CONTENT */
         .content {
             margin-left: 260px;
             width: calc(100% - 260px);
             padding: 35px 50px;
             box-sizing: border-box;
             min-height: 100vh;
+            transition: margin-left 0.3s ease, width 0.3s ease;
         }
 
-        /* TOPBAR */
+        .sidebar.collapsed + .content {
+            margin-left: 82px;
+            width: calc(100% - 82px);
+        }
+
         .topbar {
             margin-bottom: 35px;
         }
@@ -45,7 +37,6 @@
             font-size: 16px;
         }
 
-        /* STATS CARDS */
         .stats-container {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -81,7 +72,6 @@
             font-weight: 700;
         }
 
-        /* TABLE CARD */
         .card-table {
             background: #fffaf5;
             border-radius: 20px;
@@ -98,7 +88,6 @@
             margin-bottom: 25px;
         }
 
-        /* TABLE STYLING */
         .table {
             margin-bottom: 0;
         }
@@ -125,7 +114,6 @@
             background: #fef8f3;
         }
 
-        /* BADGE */
         .badge-status {
             padding: 8px 14px;
             border-radius: 20px;
@@ -148,7 +136,6 @@
             color: #721c24;
         }
 
-        /* BUTTONS */
         .btn-approve,
         .btn-reject {
             border: none;
@@ -183,12 +170,6 @@
             transform: translateY(-2px);
         }
 
-        .btn-group-sm {
-            display: flex;
-            gap: 8px;
-        }
-
-        /* EMPTY STATE */
         .empty-state {
             text-align: center;
             padding: 50px 20px;
@@ -201,49 +182,24 @@
             opacity: 0.6;
         }
 
-        /* RESPONSIVE */
-        @media(max-width: 992px) {
+        @media (max-width: 992px) {
             .content {
                 margin-left: 0;
                 width: 100%;
-                padding: 25px 20px;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
-
-            .card-table {
-                padding: 20px;
-            }
-
-            .topbar h1 {
-                font-size: 32px;
-            }
-
-            .table {
-                font-size: 14px;
-            }
-
-            .table thead th,
-            .table tbody td {
-                padding: 10px;
+                padding: 25px 22px;
             }
         }
     </style>
 </head>
-
 <body>
     <?= view('layout/sidebar'); ?>
 
     <div class="content">
-        <!-- TOPBAR -->
         <div class="topbar">
             <h1>Dashboard SPV</h1>
             <p>Kelola dan approve pengajuan cuti tim Anda</p>
         </div>
 
-        <!-- STATS -->
         <div class="stats-container">
             <div class="stat-card">
                 <div class="stat-icon">
@@ -310,8 +266,8 @@
                                     <td><?= $c['total_hari']; ?> hari</td>
                                     <td><?= substr($c['alasan'], 0, 50); ?><?= strlen($c['alasan']) > 50 ? '...' : ''; ?></td>
                                     <td>
-                                        <span class="badge-status badge-<?= strtolower($c['status']); ?>">
-                                            <?= ucfirst($c['status']); ?>
+                                        <span class="badge-status badge-<?= str_replace('_', '-', strtolower($c['status'])); ?>">
+                                            <?= ucwords(str_replace('_', ' ', $c['status'])) ?>
                                         </span>
                                     </td>
                                 </tr>
@@ -322,8 +278,5 @@
             <?php endif; ?>
         </div>
     </div>
-
-    <?= view('layout/footer'); ?>
 </body>
-
 </html>

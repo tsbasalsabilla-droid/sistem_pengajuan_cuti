@@ -1,7 +1,7 @@
 <?= $this->include('layout/header') ?>
 <?= $this->include('layout/sidebarhrd') ?>
 
-<a href="/pegawai/create" class="btn btn-primary">Tambah pegawai</a>
+<a href="/hrd/pegawai/create" class="btn btn-primary">Tambah pegawai</a>
 <h1>Daftar Pegawai</h1>
 
 <table class="table">
@@ -35,8 +35,8 @@
                 <td><?= $p['alamat'] ?></td>
                 <td><?= $p['saldo_cuti'] ?></td>
                 <td>
-                    <a href="/pegawai/edit/<?= $p['id']; ?>" class="btn btn-warning">Edit</a>
-                    <a href="/pegawai/delete/<?= $p['id']; ?>" class="btn btn-danger" onclick="return confirm('apakah anda yakin');">Delete</a>
+                    <a href="/hrd/pegawai/edit/<?= $p['id']; ?>" class="btn btn-warning">Edit</a>
+                    <a href="/hrd/pegawai/delete/<?= $p['id']; ?>" class="btn btn-danger" onclick="return confirm('apakah anda yakin');">Delete</a>
                 </td>
             </tr>
         <?php endforeach; ?>

@@ -29,17 +29,17 @@ class LaporanController extends BaseController
             'laporan' => $laporan
         ];
 
-        return view('laporan/index', $data);
+        return view('hrd/laporan/index', $data);
     }
 
     public function delete($id)
     {
         $this->LaporanModel->delete($id);
         session()->setFlashdata('pesan', 'Data berhasil dihapus.');
-        return redirect()->to('/laporan');
+        return redirect()->to('/hrd/laporan');
     }
 
-     public function exportExcel()
+    public function exportExcel()
     {
         $laporan = $this->LaporanModel->getLaporan();
 
@@ -58,7 +58,7 @@ class LaporanController extends BaseController
         echo '.text-center { text-align: center; }';
         echo '</style></head><body>';
 
-        echo '<table>'; 
+        echo '<table>';
         echo '<tr>';
         echo '<th class="text-center">No</th>';
         echo '<th class="text-left">Nama</th>';
@@ -94,4 +94,3 @@ class LaporanController extends BaseController
         exit;
     }
 }
-

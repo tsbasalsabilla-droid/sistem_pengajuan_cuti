@@ -149,8 +149,8 @@
                                 <td><?= $c['alasan']; ?></td>
                                 <td><?= ucfirst($c['status']); ?></td>
                                 <td>
-                                    <a href="/direktur/approve/<?= $c['id']; ?>" class="btn-approve">Approve</a>
-                                    <a href="/direktur/reject/<?= $c['id']; ?>" class="btn-reject">Reject</a>
+                                    <a href="/approval/approve-direktur/<?= $c['id']; ?>" class="btn-approve">Approve</a>
+                                    <a href="/approval/reject-direktur/<?= $c['id']; ?>" class="btn-reject">Reject</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

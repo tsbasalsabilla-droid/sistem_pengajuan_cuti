@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Controllers;
 
 use App\Models\UserModel;
@@ -17,7 +18,7 @@ class pegawaiController extends BaseController
         $this->JabatanModel = new JabatanModel();
         $this->DivisiModel = new DivisiModel();
     }
-    
+
     public function index()
     {
         $data = [
@@ -45,20 +46,20 @@ class pegawaiController extends BaseController
 
 
         $rules = [
-    'nama'       => 'required',
-    'nip'        => 'required',
-    'email'      => 'required',
-    'id_jabatan' => 'required',
-    'id_divisi'  => 'required',
-    'no_hp'      => 'required',
-    'alamat'     => 'required',
-];
+            'nama'       => 'required',
+            'nip'        => 'required',
+            'email'      => 'required',
+            'id_jabatan' => 'required',
+            'id_divisi'  => 'required',
+            'no_hp'      => 'required',
+            'alamat'     => 'required',
+        ];
 
-if (!$this->validate($rules)) {
-    return redirect()->to('/pegawai/create')
-        ->withInput()
-        ->with('validation', \Config\Services::validation());
-}
+        if (!$this->validate($rules)) {
+            return redirect()->to('/hrd/pegawai/create')
+                ->withInput()
+                ->with('validation', \Config\Services::validation());
+        }
 
         $this->UserModel->save([
             'nama' => $this->request->getVar('nama'),
@@ -73,50 +74,50 @@ if (!$this->validate($rules)) {
 
         session()->setFlashdata('pesan', 'Data berhasil ditambahkan.');
 
-        return redirect()->to('/pegawai');
+        return redirect()->to('/hrd/pegawai');
     }
 
     public function delete($id)
     {
         $this->UserModel->delete($id);
         session()->setFlashdata('pesan', 'Data berhasil dihapus.');
-        return redirect()->to('/pegawai');
+        return redirect()->to('/hrd/pegawai');
     }
-    
-public function edit($id) 
-{
-    $data = [
-            'title' => 'Ubah pegawai', 
-            'validation' => session('validation') ?? \Config\Services::validation(), 
 
-            'pegawai' => $this->UserModel->getPegawai($id), 
+    public function edit($id)
+    {
+        $data = [
+            'title' => 'Ubah pegawai',
+            'validation' => session('validation') ?? \Config\Services::validation(),
+
+            'pegawai' => $this->UserModel->getPegawai($id),
             'jabatan' => $this->JabatanModel->findAll(),
             'divisi' => $this->DivisiModel->findAll(),
         ];
 
-    return view('pegawai/edit', $data);
-}
+        return view('pegawai/edit', $data);
+    }
 
-public function update($id)
-{
+    public function update($id)
+    {
 
- $rules = [
-    'nama'       => 'required',
-    'nip'        => 'required',
-    'email'      => 'required',
-    'id_jabatan' => 'required',
-    'id_divisi'  => 'required',
-    'no_hp'      => 'required',
-    'alamat'     => 'required',
-];
+        $rules = [
+            'nama'       => 'required',
+            'nip'        => 'required',
+            'email'      => 'required',
+            'id_jabatan' => 'required',
+            'id_divisi'  => 'required',
+            'no_hp'      => 'required',
+            'alamat'     => 'required',
+        ];
 
-if (!$this->validate($rules)) {
-    return redirect()->to('/pegawai/create' . $id)
-        ->withInput()
-        ->with('validation', \Config\Services::validation());
-}
+        if (!$this->validate($rules)) {
+            return redirect()->to('/hrd/pegawai/edit/' . $id)
+                ->withInput()
+                ->with('validation', \Config\Services::validation());
+        }
 
-     $this->UserModel->save([
+        $this->UserModel->save([
             'id' => $id,
             'nama' => $this->request->getVar('nama'),
             'nip' => $this->request->getVar('nip'),
@@ -130,8 +131,6 @@ if (!$this->validate($rules)) {
 
         session()->setFlashdata('pesan', 'Data berhasil diubah.');
 
-        return redirect()->to('/pegawai');
+        return redirect()->to('/hrd/pegawai');
+    }
 }
-}
-
-

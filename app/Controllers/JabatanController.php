@@ -13,26 +13,26 @@ class JabatanController extends BaseController
         $this->jabatanModel = new JabatanModel();
     }
 
-        public function index()
-        {
-            $data = [
-                'title' => 'Data jabatan',
-                'jabatan' => $this->jabatanModel->getJabatan()
-            ];
-            return view('jabatan/index', $data);
-        }
+    public function index()
+    {
+        $data = [
+            'title' => 'Data jabatan',
+            'jabatan' => $this->jabatanModel->getJabatan()
+        ];
+        return view('hrd/jabatan/index', $data);
+    }
 
-        public function create()
-        {
-            $data = [
-                'title' => 'Tambah jabatan',
+    public function create()
+    {
+        $data = [
+            'title' => 'Tambah jabatan',
 
-                'validation' => session('validation') ?? \Config\Services::validation()
+            'validation' => session('validation') ?? \Config\Services::validation()
 
-            ];
+        ];
 
-            return view('jabatan/create', $data);
-        }
+        return view('hrd/jabatan/create', $data);
+    }
 
     public function save()
     {
@@ -42,7 +42,7 @@ class JabatanController extends BaseController
             'jabatan' => 'required',
         ])) {
             $validation = \Config\Services::validation();
-            return redirect()->to('/jabatan/create')->withInput()->with('validation', $validation);
+            return redirect()->to('/hrd/jabatan/create')->withInput()->with('validation', $validation);
         }
 
         $this->jabatanModel->save([
@@ -51,14 +51,14 @@ class JabatanController extends BaseController
 
         session()->setFlashdata('pesan', 'Data berhasil ditambahkan.');
 
-        return redirect()->to('/jabatan');
+        return redirect()->to('/hrd/jabatan');
     }
 
     public function delete($id)
     {
         $this->jabatanModel->delete($id);
         session()->setFlashdata('pesan', 'Data berhasil dihapus.');
-        return redirect()->to('/jabatan');
+        return redirect()->to('/hrd/jabatan');
     }
 
     public function edit($id)
@@ -70,7 +70,7 @@ class JabatanController extends BaseController
             'jabatan' => $this->jabatanModel->getJabatan($id)
         ];
 
-        return view('jabatan/edit', $data);
+        return view('hrd/jabatan/edit', $data);
     }
 
     public function update($id)
@@ -81,7 +81,7 @@ class JabatanController extends BaseController
             'jabatan' => 'required',
         ])) {
             $validation = \Config\Services::validation();
-            return redirect()->to('/jabatan/edit/' . $id)->withInput()->with('validation', $validation);
+            return redirect()->to('/hrd/jabatan/edit/' . $id)->withInput()->with('validation', $validation);
         }
 
         $this->jabatanModel->save([
@@ -91,6 +91,6 @@ class JabatanController extends BaseController
 
         session()->setFlashdata('pesan', 'Data berhasil diubah.');
 
-        return redirect()->to('/jabatan');
+        return redirect()->to('/hrd/jabatan');
     }
 }

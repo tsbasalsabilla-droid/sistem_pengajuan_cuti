@@ -5,23 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Approval SPV</title>
-
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
     <style>
-        body {
-            background: #f6f1eb;
-            font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden;
-        }
-
         .content {
             margin-left: 260px;
             width: calc(100% - 260px);
             padding: 35px 50px;
             box-sizing: border-box;
             min-height: 100vh;
+            transition: margin-left 0.3s ease, width 0.3s ease;
+        }
+
+        .sidebar.collapsed+.content {
+            margin-left: 82px;
+            width: calc(100% - 82px);
         }
 
         .topbar h1 {
@@ -34,6 +32,7 @@
         .topbar p {
             color: #9a7456;
             font-size: 16px;
+            margin-bottom: 30px;
         }
 
         .card-table {
@@ -102,11 +101,11 @@
             transform: translateY(-2px);
         }
 
-        @media(max-width: 992px) {
+        @media (max-width: 992px) {
             .content {
                 margin-left: 0;
                 width: 100%;
-                padding: 25px 20px;
+                padding: 25px 22px;
             }
         }
     </style>
@@ -147,10 +146,9 @@
                                 </td>
                                 <td><?= $c['total_hari']; ?> hari</td>
                                 <td><?= $c['alasan']; ?></td>
-                                <td><?= ucfirst($c['status']); ?></td>
+                                <td><?= ucwords(str_replace('_', ' ', $c['status'])) ?></td>
                                 <td>
-                                    <a href="/spv/approve/<?= $c['id']; ?>" class="btn-approve">Approve</a>
-                                    <a href="/spv/reject/<?= $c['id']; ?>" class="btn-reject">Reject</a>
+                                    <a href="/approvalspv" class="btn-approve">Approval</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -159,8 +157,6 @@
             </div>
         </div>
     </div>
-
-    <?= view('layout/footer'); ?>
 </body>
 
 </html>

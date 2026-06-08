@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\ApprovalModel;
-use App\Models\CutiModel;
+use App\Models\PengajuanCutiModel;
 
 class ApprovalhrdController extends BaseController
 {
@@ -12,14 +12,14 @@ class ApprovalhrdController extends BaseController
 
     public function __construct()
     {
-        $this->cutiModel = new CutiModel();
+        $this->cutiModel = new PengajuanCutiModel();
         $this->approvalModel = new ApprovalModel();
     }
 
     public function index()
     {
         $data['cuti'] = $this->cutiModel
-            ->where('current_step', 'hrd')
+            ->where('status', 'pending')
             ->findAll();
 
         return view('approval/index', $data);
@@ -27,9 +27,13 @@ class ApprovalhrdController extends BaseController
 
     public function approve($id)
     {
+        $cuti = $this->cutiModel->find($id);
+        if ($cuti && $cuti['pegawai_id'] == session()->get('user')['id']) {
+            return redirect()->back()->with('error', 'Anda tidak bisa menyetujui pengajuan sendiri.');
+        }
+
         $this->cutiModel->update($id, [
-            'status' => 'approved',
-            'current_step' => 'selesai'
+            'status' => 'approve'
         ]);
 
         $this->approvalModel->save([

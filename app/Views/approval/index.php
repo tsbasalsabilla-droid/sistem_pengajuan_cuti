@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Approval HRD</title>
+    <title>Approval</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -113,12 +113,12 @@
 </head>
 
 <body>
-    <?= view('layout/sidebarhrd'); ?>
+    <?= view('layout/sidebar'); ?>
 
     <div class="content">
         <div class="topbar">
-            <h1>Approval HRD</h1>
-            <p>Daftar pengajuan cuti yang menunggu persetujuan HRD.</p>
+            <h1>Approval</h1>
+            <p>Daftar pengajuan cuti yang menunggu persetujuan</p>
         </div>
 
         <div class="card-table">
@@ -149,8 +149,8 @@
                                 <td><?= $c['alasan']; ?></td>
                                 <td><?= ucfirst($c['status']); ?></td>
                                 <td>
-                                    <a href="/hrd/approve/<?= $c['id']; ?>" class="btn-approve">Approve</a>
-                                    <a href="/hrd/reject/<?= $c['id']; ?>" class="btn-reject">Reject</a>
+                                    <a href="/approval/approve-hrd/<?= $c['id']; ?>" class="btn-approve">Approve</a>
+                                    <a href="/approval/reject-hrd/<?= $c['id']; ?>" class="btn-reject">Tolak</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

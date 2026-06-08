@@ -19,7 +19,7 @@ class Cuti_bersamaController extends BaseController
             'title' => 'Data Cuti Bersama',
             'cuti_bersama' => $this->cuti_bersamaModel->getcuti()
         ];
-        return view('cuti_bersama/index', $data);
+        return view('hrd/cuti_bersama/index', $data);
     }
 
     public function create()
@@ -31,7 +31,7 @@ class Cuti_bersamaController extends BaseController
 
         ];
 
-        return view('cuti_bersama/create', $data);
+        return view('hrd/cuti_bersama/create', $data);
     }
 
     public function save()
@@ -43,7 +43,7 @@ class Cuti_bersamaController extends BaseController
             'keterangan' => 'required',
         ])) {
             $validation = \Config\Services::validation();
-            return redirect()->to('/cuti_bersama/create')->withInput()->with('validation', $validation);
+            return redirect()->to('/hrd/cuti_bersama/create')->withInput()->with('validation', $validation);
         }
 
         $this->cuti_bersamaModel->save([
@@ -53,14 +53,14 @@ class Cuti_bersamaController extends BaseController
 
         session()->setFlashdata('pesan', 'Data berhasil ditambahkan.');
 
-        return redirect()->to('/cuti_bersama');
+        return redirect()->to('/hrd/cuti_bersama');
     }
 
     public function delete($id)
     {
         $this->cuti_bersamaModel->delete($id);
         session()->setFlashdata('pesan', 'Data berhasil dihapus.');
-        return redirect()->to('/cuti_bersama');
+        return redirect()->to('/hrd/cuti_bersama');
     }
 
     public function edit($id)
@@ -72,7 +72,7 @@ class Cuti_bersamaController extends BaseController
             'cuti_bersama' => $this->cuti_bersamaModel->getcuti($id)
         ];
 
-        return view('cuti_bersama/edit', $data);
+        return view('hrd/cuti_bersama/edit', $data);
     }
 
     public function update($id)
@@ -84,7 +84,7 @@ class Cuti_bersamaController extends BaseController
             'keterangan' => 'required',
         ])) {
             $validation = \Config\Services::validation();
-            return redirect()->to('/cuti_bersama/edit/' . $id)->withInput()->with('validation', $validation);
+            return redirect()->to('/hrd/cuti_bersama/edit/' . $id)->withInput()->with('validation', $validation);
         }
 
         $this->cuti_bersamaModel->save([
@@ -95,7 +95,6 @@ class Cuti_bersamaController extends BaseController
 
         session()->setFlashdata('pesan', 'Data berhasil diubah.');
 
-        return redirect()->to('/cuti_bersama');
+        return redirect()->to('/hrd/cuti_bersama');
     }
 }
-
