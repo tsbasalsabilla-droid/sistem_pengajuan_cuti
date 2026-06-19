@@ -2,60 +2,57 @@
 
 namespace App\Controllers;
 
-use App\Models\SaldoCutiModel;
+use App\Models\PegawaiModel;
 use App\Models\PengajuanCutiModel;
 
 class DashboardController extends BaseController
 {
-    protected $saldoModel;
+    protected $pegawaiModel;
     protected $pengajuanModel;
 
     public function __construct()
     {
-        $this->saldoModel = new SaldoCutiModel();
+
+        $this->pegawaiModel = new PegawaiModel();
         $this->pengajuanModel = new PengajuanCutiModel();
     }
 
     public function index()
     {
-        // sementara hardcode
-        $userId = 1;
+        $userId = session()->get('user')['id'];
 
-        // SALDO CUTI
-        
-        $saldo = $this->saldoModel
-            ->where('pegawai_id', $userId)
-            ->first();
 
-        // PENGAJUAN TERAKHIR
+        $saldo = $this->pegawaiModel->find($userId);
+
+
         $pengajuanTerakhir = $this->pengajuanModel
             ->where('pegawai_id', $userId)
             ->orderBy('id', 'DESC')
             ->first();
 
-        // STATUS PENGAJUAN AKTIF
+
         $statusAktif = $this->pengajuanModel
             ->where('pegawai_id', $userId)
-            ->where('status', 'pending')
+            ->whereIn('status', ['pending_teman_sejawat', 'pending_spv', 'pending_hrd', 'pending_direktur'])
             ->orderBy('id', 'DESC')
             ->first();
 
-        // JUMLAH CUTI TAHUN INI
+
         $jumlahCuti = $this->pengajuanModel
             ->selectSum('total_hari')
             ->where('pegawai_id', $userId)
-            ->where('status', 'approve')
+            ->where('status', 'approved')
             ->where('tanggal_mulai >=', date('Y-01-01'))
             ->where('tanggal_selesai <=', date('Y-12-31'))
             ->first();
 
         $data = [
-            'saldo' => $saldo,
+            'saldo'             => $saldo,
             'pengajuanTerakhir' => $pengajuanTerakhir,
-            'statusAktif' => $statusAktif,
-            'jumlahCuti' => $jumlahCuti
+            'statusAktif'       => $statusAktif,
+            'jumlahCuti'        => $jumlahCuti
         ];
 
-       return view('pegawai/dashboard/index', $data);
+        return view('pegawai/dashboard/index', $data);
     }
 }

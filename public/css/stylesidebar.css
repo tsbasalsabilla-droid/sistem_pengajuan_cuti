@@ -7,11 +7,10 @@
         body {
             font-family: 'Segoe UI', sans-serif;
             background: #f5f0eb;
-            display: flex;
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
+        
         .sidebar {
             width: 260px;
             min-height: 100vh;
@@ -25,7 +24,7 @@
             overflow: hidden;
         }
 
-        /* Shape dekoratif header */
+        
         .sidebar::before {
             content: '';
             position: absolute;
@@ -35,7 +34,6 @@
             z-index: 0;
         }
 
-        /* ===== BRAND ===== */
         .sidebar-brand {
             position: relative;
             z-index: 1;
@@ -71,7 +69,6 @@
             color: rgba(255, 255, 255, 0.55);
         }
 
-        /* ===== USER CARD ===== */
         .sidebar-user {
             position: relative;
             z-index: 1;
@@ -118,7 +115,6 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
-        /* ===== NAVIGASI ===== */
         .sidebar-nav {
             flex: 1;
             padding: 0.5rem 0 1rem;
@@ -180,7 +176,6 @@
             color: #d2b48c;
         }
 
-        /* Garis vertikal indikator aktif */
         .nav-link-item.active::before {
             content: '';
             position: absolute;
@@ -192,7 +187,6 @@
             border-radius: 0 3px 3px 0;
         }
 
-        /* Badge */
         .nav-badge {
             font-size: 10px;
             background: rgba(210, 180, 140, 0.25);
@@ -201,7 +195,6 @@
             border-radius: 20px;
         }
 
-        /* ===== FOOTER ===== */
         .sidebar-footer {
             position: relative;
             z-index: 1;
@@ -235,13 +228,14 @@
             font-size: 16px;
         }
 
-        /* ===== MAIN CONTENT ===== */
         .main-content {
             margin-left: 260px;
             flex: 1;
             display: flex;
+            width: auto;
             flex-direction: column;
             min-height: 100vh;
+            padding: 3rem;
         }
 
         .topbar {
@@ -292,5 +286,6 @@
         }
 
         .page-content {
-            padding: 1.5rem;
+            width: 100%;
+            max-width: none;
         }

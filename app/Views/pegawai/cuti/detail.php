@@ -100,262 +100,255 @@
     }
 </style>
 
-<h1 class="page-title">
-    Detail Pengajuan Cuti
-</h1>
+<h1 class="page-title">Detail Pengajuan Cuti</h1>
 
-<!-- INFORMASI CUTI -->
 <div class="card">
-
     <h3>Informasi Pengajuan</h3>
-
     <div class="detail-grid">
-
         <div class="detail-item">
             <label>Tanggal Mulai</label>
-
-            <strong>
-                <?= $cuti['tanggal_mulai']; ?>
-            </strong>
+            <strong><?= $cuti['tanggal_mulai']; ?></strong>
         </div>
-
         <div class="detail-item">
             <label>Tanggal Selesai</label>
-
-            <strong>
-                <?= $cuti['tanggal_selesai']; ?>
-            </strong>
+            <strong><?= $cuti['tanggal_selesai']; ?></strong>
         </div>
-
         <div class="detail-item">
             <label>Total Hari</label>
-
-            <strong>
-                <?= $cuti['total_hari']; ?> Hari
-            </strong>
+            <strong><?= $cuti['total_hari']; ?> Hari</strong>
         </div>
-
         <div class="detail-item">
             <label>Tujuan Cuti</label>
-
-            <strong>
-                <?= $cuti['alasan']; ?>
-            </strong>
+            <strong><?= $cuti['alasan']; ?></strong>
         </div>
-
         <div class="detail-item">
             <label>Status Pengajuan</label>
-
             <?php
-
             $statusClass = 'pending';
-
-            if ($cuti['status'] == 'approve') {
+            if ($cuti['status'] == 'approve' || $cuti['status'] == 'approved') {
                 $statusClass = 'approved';
             }
-
-            if ($cuti['status'] == 'rejected' || $cuti['status'] == 'ditolak') {
+            if (in_array($cuti['status'], ['rejected', 'ditolak'])) {
                 $statusClass = 'rejected';
             }
 
+            $statusLabel = match ($cuti['status']) {
+                'pending' => 'MENUNGGU TEMAN SEJAWAT',
+                'pending_spv' => 'MENUNGGU SPV',
+                'pending_hrd' => 'MENUNGGU HRD',
+                'pending_direktur' => 'MENUNGGU DIREKTUR',
+                'approve', 'approved', 'diterima' => 'DISETUJUI',
+                'rejected', 'ditolak' => 'DITOLAK',
+                default => strtoupper($cuti['status'])
+            };
             ?>
-
             <div class="status-box <?= $statusClass; ?>">
-                <?= strtoupper($cuti['status']); ?>
+                <?= $statusLabel; ?>
             </div>
-
         </div>
-
         <div class="detail-item">
             <label>Tanggal Pengajuan</label>
-
-            <strong>
-                <?= $cuti['tanggal_mulai']; ?>
-            </strong>
+            <strong><?= $cuti['tanggal_mulai']; ?></strong>
         </div>
-
     </div>
-
 </div>
 
-<!-- STATUS APPROVAL -->
 <div class="card">
-
     <h3>Status Approval Lengkap</h3>
-
     <table>
-
-        <tr>
-            <th>Level Approval</th>
-            <th>Status</th>
-            <th>Disetujui Oleh</th>
-            <th>Waktu Approval</th>
-            <th>Catatan Penolakan</th>
-        </tr>
-
-        <?php
-
-        $approvalList = [
-            'spv' => 'Pending SPV',
-            'hrd' => 'Pending HRD',
-            'direktur' => 'Pending Direktur'
-        ];
-
-        // Gunakan tanggal_mulai sebagai identitas pengajuan, bukan current_step.
-        $hasTemanApproval = false;
-        foreach ($tracking as $t) {
-            if ($t['level_approval'] === 'teman') {
-                $hasTemanApproval = true;
-                break;
-            }
-        }
-
-        if ($hasTemanApproval) {
-            $approvalList = [
-                'spv' => 'Pending SPV',
-                'teman' => 'Pending Teman Sejawat',
-                'hrd' => 'Pending HRD',
-                'direktur' => 'Pending Direktur'
-            ];
-        }
-
-        ?>
-
-        <?php foreach ($approvalList as $key => $label): ?>
-
+        <thead>
+            <tr>
+                <th>Level Approval</th>
+                <th>Status</th>
+                <th>Disetujui Oleh</th>
+                <th>Catatan Penolakan</th>
+            </tr>
+        </thead>
+        <tbody>
             <?php
 
-            $found = null;
+            $listApprovalTeman = array_filter($tracking, fn($t) => strtolower($t['level_approval'] ?? '') === 'teman');
 
-            foreach ($tracking as $t) {
+            $jumlahApprove = 0;
+            $jumlahReject = 0;
 
-                if ($t['level_approval'] == $key) {
-                    $found = $t;
-                    break;
+            foreach ($listApprovalTeman as $t) {
+                if (strtolower($t['status'] ?? '') === 'approved' || strtolower($t['status'] ?? '') === 'approve') {
+                    $jumlahApprove++;
+                } elseif (strtolower($t['status'] ?? '') === 'rejected' || strtolower($t['status'] ?? '') === 'ditolak') {
+                    $jumlahReject++;
                 }
             }
 
+            $totalSuaraMasuk = $jumlahApprove + $jumlahReject;
+
+            $temanStatus = 'MENUNGGU';
+            $temanClass = 'pending';
+
+            if ($totalSuaraMasuk < 3) {
+                $temanStatus = "VOTING ($totalSuaraMasuk/3)";
+                $temanClass = 'pending';
+            } else {
+                if ($jumlahApprove > $jumlahReject) {
+                    $temanStatus = 'DISETUJUI';
+                    $temanClass = 'approved';
+                } else {
+                    $temanStatus = 'DITOLAK';
+                    $temanClass = 'rejected';
+                }
+            }
+
+
+            $currentStatus = $cuti['status'];
+
+            $spvLog = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'spv');
+            $spvLog = reset($spvLog);
+
+            $spvStatus = 'MENUNGGU';
+            $spvClass = 'pending';
+            if ($spvLog) {
+                if (strtolower($spvLog['status']) === 'approved') {
+                    $spvStatus = 'DISETUJUI';
+                    $spvClass = 'approved';
+                } else {
+                    $spvStatus = 'DITOLAK';
+                    $spvClass = 'rejected';
+                }
+            } elseif ($currentStatus === 'rejected' || $currentStatus === 'ditolak') {
+                $spvStatus = 'DITOLAK';
+                $spvClass = 'rejected';
+            }
+
+            $hrdLog = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'hrd');
+            $hrdLog = reset($hrdLog);
+
+            $hrdStatus = 'MENUNGGU';
+            $hrdClass = 'pending';
+            if ($hrdLog) {
+                if (strtolower($hrdLog['status']) === 'approved') {
+                    $hrdStatus = 'DISETUJUI';
+                    $hrdClass = 'approved';
+                } else {
+                    $hrdStatus = 'DITOLAK';
+                    $hrdClass = 'rejected';
+                }
+            } elseif ($currentStatus === 'rejected' || $currentStatus === 'ditolak') {
+                $hrdStatus = 'DITOLAK';
+                $hrdClass = 'rejected';
+            }
+
+            $dirLog = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'direktur');
+            $dirLog = reset($dirLog);
+
+            $dirStatus = 'MENUNGGU';
+            $dirClass = 'pending';
+            if ($dirLog) {
+                if (strtolower($dirLog['status']) === 'approved') {
+                    $dirStatus = 'DISETUJUI';
+                    $dirClass = 'approved';
+                } else {
+                    $dirStatus = 'DITOLAK';
+                    $dirClass = 'rejected';
+                }
+            } elseif ($currentStatus === 'rejected' || $currentStatus === 'ditolak') {
+                $dirStatus = 'DITOLAK';
+                $dirClass = 'rejected';
+            }
+
+
+            $detailTeman = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'teman');
+
+            $detailSpv = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'spv');
+            $detailSpv = reset($detailSpv);
+
+            $detailHrd = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'hrd');
+            $detailHrd = reset($detailHrd);
+
+            $detailDir = array_filter($tracking, fn($t) => ($t['level_approval'] ?? $t['role_approver'] ?? '') === 'direktur');
+            $detailDir = reset($detailDir);
             ?>
 
             <tr>
-
+                <td>Menunggu Teman Sejawat</td>
+                <td><span class="status-box <?= $temanClass; ?>"><?= $temanStatus; ?></span></td>
                 <td>
-                    <?= $label; ?>
+                    <?php if (!empty($detailTeman)): ?>
+                        <?php
+                        $namaTeman = array_map(fn($t) => trim($t['nama'] ?? ''), $detailTeman);
+                        $namaTemanSaring = array_filter($namaTeman, fn($nama) => $nama !== '' && $nama !== '-');
+                        echo !empty($namaTemanSaring) ? implode(', ', $namaTemanSaring) : '-';
+                        ?>
+                    <?php else: ?> - <?php endif; ?>
                 </td>
-
                 <td>
-
-                    <?php if ($found): ?>
-
-                        <?php if ($found['status'] == 'approved'): ?>
-
-                            <span class="status-box approved">
-                                APPROVED
-                            </span>
-
-                        <?php elseif ($found['status'] == 'rejected'): ?>
-
-                            <span class="status-box rejected">
-                                REJECTED
-                            </span>
-
-                        <?php else: ?>
-
-                            <span class="status-box pending">
-                                PENDING
-                            </span>
-
-                        <?php endif; ?>
-
-                    <?php else: ?>
-
-                        <span class="status-box pending">
-                            MENUNGGU
-                        </span>
-
-                    <?php endif; ?>
-
+                    <?php if (!empty($detailTeman)): ?>
+                        <?php
+                        $catatanTemanArr = [];
+                        foreach ($detailTeman as $t) {
+                            $statusSaran = strtolower($t['status'] ?? '');
+                            if (($statusSaran === 'rejected' || $statusSaran === 'ditolak') && !empty($t['catatan']) && trim($t['catatan']) !== '-') {
+                                $catatanTemanArr[] = ($t['nama'] ?? 'Teman') . ': ' . $t['catatan'];
+                            }
+                        }
+                        echo !empty($catatanTemanArr) ? implode(', ', $catatanTemanArr) : '-';
+                        ?>
+                    <?php else: ?> - <?php endif; ?>
                 </td>
-
-                <td>
-                    <?= $found['nama'] ?? '-'; ?>
-                </td>
-
-                <td>
-                    <?= $found['approved_at'] ?? '-'; ?>
-                </td>
-
-                <td>
-                    <?= $found['catatan'] ?? '-'; ?>
-                </td>
-
             </tr>
 
-        <?php endforeach; ?>
+            <tr>
+                <td>Menunggu SPV</td>
+                <td><span class="status-box <?= $spvClass; ?>"><?= $spvStatus; ?></span></td>
+                <td><?= !empty($detailSpv['nama']) && $detailSpv['nama'] !== '-' ? $detailSpv['nama'] : ($spvStatus === 'DITOLAK' ? '-' : '-'); ?></td>
+                <td><?= $detailSpv['catatan'] ?? '-'; ?></td>
+            </tr>
 
+            <tr>
+                <td>Menunggu HRD</td>
+                <td><span class="status-box <?= $hrdClass; ?>"><?= $hrdStatus; ?></span></td>
+                <td><?= !empty($detailHrd['nama']) && $detailHrd['nama'] !== '-' ? $detailHrd['nama'] : ($hrdStatus === 'DITOLAK' ? '-' : '-'); ?></td>
+                <td><?= $detailHrd['catatan'] ?? '-'; ?></td>
+            </tr>
+
+            <tr>
+                <td>Menunggu Direktur</td>
+                <td><span class="status-box <?= $dirClass; ?>"><?= $dirStatus; ?></span></td>
+                <td><?= !empty($detailDir['nama']) && $detailDir['nama'] !== '-' ? $detailDir['nama'] : ($dirStatus === 'DITOLAK' ? '-' : '-'); ?></td>
+                <td><?= $detailDir['catatan'] ?? '-'; ?></td>
+            </tr>
+        </tbody>
     </table>
-
 </div>
 
-<!-- TIMELINE -->
 <div class="card">
-
     <h3>Timeline Approval</h3>
-
     <div class="timeline">
+        <?php if (!empty($tracking)): ?>
+            <?php
+            $hasVisibleTimeline = false;
+            foreach ($tracking as $t):
+                $namaEksekutor = isset($t['nama']) ? trim($t['nama']) : '';
 
-        <?php if ($tracking): ?>
-
-            <?php foreach ($tracking as $t): ?>
-
+                if ($namaEksekutor === '' || $namaEksekutor === '-' || empty($namaEksekutor)) {
+                    continue;
+                }
+                $hasVisibleTimeline = true;
+            ?>
                 <div class="timeline-item">
-
-                    <h4>
-                        <?= strtoupper($t['level_approval']); ?>
-                    </h4>
-
-                    <p>
-                        Status:
-                        <strong>
-                            <?= strtoupper($t['status']); ?>
-                        </strong>
-                    </p>
-
-                    <p>
-                        Oleh:
-                        <strong>
-                            <?= $t['nama'] ?? '-'; ?>
-                        </strong>
-                    </p>
-
-                    <p>
-                        Waktu:
-                        <strong>
-                            <?= $t['approved_at'] ?? '-'; ?>
-                        </strong>
-                    </p>
-
-                    <p>
-                        Catatan:
-                        <strong>
-                            <?= $t['catatan'] ?? '-'; ?>
-                        </strong>
-                    </p>
-
+                    <h4><?= strtoupper($t['level_approval'] === 'teman' ? 'TEMAN SEJAWAT' : $t['level_approval']); ?></h4>
+                    <p>Status: <strong><?= strtoupper($t['status']); ?></strong></p>
+                    <p>Oleh: <strong><?= esc($namaEksekutor); ?></strong></p>
+                    <p>Catatan: <strong><?= esc($t['catatan'] ?? '-'); ?></strong></p>
                 </div>
-
             <?php endforeach; ?>
 
+            <?php if (!$hasVisibleTimeline): ?>
+                <p class="text-muted">Belum ada history approval yang divalidasi.</p>
+            <?php endif; ?>
         <?php else: ?>
-
-            <p>
-                Belum ada approval.
-            </p>
-
+            <p class="text-muted">Belum ada approval.</p>
         <?php endif; ?>
-
     </div>
-
 </div>
 
 <?= $this->endSection(); ?>

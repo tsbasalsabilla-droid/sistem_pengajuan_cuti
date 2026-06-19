@@ -13,7 +13,6 @@ class Direktur extends BaseController
         $this->cutiModel = new PengajuanCutiModel();
     }
 
-    // Approval Direktur
     public function index()
     {
         $data['cuti'] = $this->cutiModel
@@ -23,7 +22,6 @@ class Direktur extends BaseController
         return view('direktur/index', $data);
     }
 
-    // Approve pengajuan
     public function approve($id)
     {
         $cuti = $this->cutiModel->find($id);
@@ -31,12 +29,10 @@ class Direktur extends BaseController
             return redirect()->back()->with('error', 'Anda tidak bisa menyetujui pengajuan sendiri.');
         }
 
-        // update status cuti
         $this->cutiModel->update($id, [
-            'status' => 'approve'
+            'status' => 'approved'
         ]);
 
-        // insert approval log
         $approvalModel = new \App\Models\ApprovalModel();
         $approvalModel->save([
             'cuti_id' => $id,
@@ -47,7 +43,6 @@ class Direktur extends BaseController
         return redirect()->to('/direktur')->with('success', 'Pengajuan cuti disetujui!');
     }
 
-    // Reject pengajuan
     public function reject($id)
     {
         $cuti = $this->cutiModel->find($id);
@@ -55,12 +50,10 @@ class Direktur extends BaseController
             return redirect()->back()->with('error', 'Anda tidak bisa menolak pengajuan sendiri.');
         }
 
-        // update status cuti
         $this->cutiModel->update($id, [
             'status' => 'rejected'
         ]);
 
-        // insert approval log
         $approvalModel = new \App\Models\ApprovalModel();
         $approvalModel->save([
             'cuti_id' => $id,
@@ -71,22 +64,19 @@ class Direktur extends BaseController
         return redirect()->to('/direktur')->with('success', 'Pengajuan cuti ditolak!');
     }
 
-    // dashboard Direktur
     public function dashboard()
     {
-        $pending = $this->cutiModel->where('status', 'pending')->countAllResults();
-        $approved = $this->cutiModel->where('status', 'approve')->countAllResults();
-        $rejected = $this->cutiModel->where('status', 'rejected')->countAllResults();
-        $approvedCuti = $this->cutiModel
-            ->where('status', 'approve')
-            ->findAll();
+        $cutiModel = new \App\Models\PengajuanCutiModel();
 
-        $data = [
-            'cuti' => $approvedCuti,
-            'pending' => $pending,
-            'approved' => $approved,
-            'rejected' => $rejected
-        ];
+        $data['pending']  = $cutiModel->where('status', 'pending_direktur')->countAllResults();
+        $data['approved'] = $cutiModel->where('status', 'approved')->countAllResults();
+        $data['rejected'] = $cutiModel->where('status', 'rejected')->countAllResults();
+
+        $data['cuti'] = $cutiModel
+            ->select('pengajuan_cuti.*, pegawai.nama AS nama_pegawai')
+            ->join('pegawai', 'pegawai.id = pengajuan_cuti.pegawai_id', 'left')
+            ->where('pengajuan_cuti.status', 'approved')
+            ->findAll();
 
         return view('direktur/dashboard', $data);
     }

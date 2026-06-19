@@ -1,6 +1,5 @@
 <?= $this->include('layout/header') ?>
 <?= $this->include('layout/sidebarhrd') ?>
-
 <style>
     .foto-pegawai {
         width: 100px;
@@ -17,6 +16,8 @@
         border: 1px solid #f1e2d2;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
         overflow: hidden;
+
+
     }
 
     .card-table h2 {
@@ -41,75 +42,60 @@
     .table {
         border-radius: 15px;
         overflow: hidden;
-        width: 100%;
-        table-layout: fixed;
     }
 
     .table tbody td {
         padding: 15px;
         color: #495057;
         border-color: #ead7c4;
-        vertical-align: middle;
-    }
-
-    .table th:first-child,
-    .table td:first-child {
-        width: 80px;
-        text-align: center;
-    }
-
-    .table th:nth-child(2),
-    .table td:nth-child(2) {
-        width: 180px;
-    }
-
-    .table tbody td:nth-child(3) {
-        text-align: center;
-    }
-
-    .table th:last-child,
-    .table td:last-child {
-        width: 180px;
-        text-align: center;
-        white-space: nowrap;
-    }
-
-    .table tbody th {
-        text-align: center;
-        vertical-align: middle;
     }
 </style>
 
+
 <div class="card-table">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1>Daftar Cuti Bersama</h1>
-        <a href="/cuti_bersama/create" class="btn btn-primary">Tambah Cuti Bersama</a>
+        <h2>Daftar Pegawai</h2>
+        <a href="/pegawai/create" class="btn btn-primary">Tambah pegawai</a>
     </div>
-
     <table class="table table-striped align-middle">
         <thead>
             <tr>
                 <th scope="col">#</th>
-                <th scope="col">Tanggal</th>
-                <th scope="col">Keterangan</th>
+                <th scope="col">Foto</th>
+                <th scope="col">Nama</th>
+                <th scope="col">NIP</th>
+                <th scope="col">Email</th>
+                <th scope="col">No HP</th>
+                <th scope="col">Jabatan</th>
+                <th scope="col">Divisi</th>
+                <th scope="col">Alamat</th>
+                <th scope="col">Saldo cuti</th>
                 <th scope="col">Aksi</th>
             </tr>
         </thead>
         <tbody>
             <?php $i = 1; ?>
-            <?php foreach ($cuti_bersama as $c) : ?>
+            <?php foreach ($pegawai as $p) : ?>
                 <tr>
                     <td><?= $i++ ?></td>
-                    <td><?= $c['tanggal'] ?></td>
-                    <td><?= $c['keterangan'] ?></td>
+                    <td><img src="/img/<?= $p['foto'] ?>" alt="" class="foto-pegawai"></td>
+                    <td><?= $p['nama'] ?></td>
+                    <td><?= $p['nip'] ?></td>
+                    <td><?= $p['email'] ?></td>
+                    <td><?= $p['no_hp'] ?></td>
+                    <td><?= $p['jabatan'] ?></td>
+                    <td><?= $p['nama_divisi'] ?></td>
+                    <td><?= $p['alamat'] ?></td>
+                    <td><?= $p['saldo_cuti'] ?></td>
                     <td>
-                        <a href="/cuti_bersama/edit/<?= $c['id']; ?>" class="btn btn-warning">Edit</a>
-                        <a href="/cuti_bersama/delete/<?= $c['id']; ?>" class="btn btn-danger" onclick="return confirm('apakah anda yakin');">Delete</a>
+                        <div class="d-flex flex-column gap-2">
+                            <a href="/pegawai/edit/<?= $p['id']; ?>" class="btn btn-warning">Edit</a>
+                            <a href="/pegawai/delete/<?= $p['id']; ?>" class="btn btn-danger" onclick="return confirm('apakah anda yakin');">Delete</a>
+                        </div>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 </div>
-
 <?= $this->include('layout/footerhrd') ?>

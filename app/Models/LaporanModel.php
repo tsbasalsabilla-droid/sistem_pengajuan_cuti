@@ -16,7 +16,7 @@ class LaporanModel extends Model
         'status',
     ];
 
-public function getLaporan()
+    public function getLaporan()
     {
         $builder = $this->db->table($this->table)
             ->join('pegawai', 'pegawai.id = ' . $this->table . '.pegawai_id')
@@ -51,5 +51,20 @@ public function getLaporan()
             ->where('tanggal_selesai >=', $start)
             ->countAllResults();
     }
-}
 
+    public function calculateActualLeaveDays($startDate, $endDate)
+    {
+        $cutiModel = new Cuti_bersamaModel();
+
+        $start = new \DateTime($startDate);
+        $end = new \DateTime($endDate);
+        $totalDays = $start->diff($end)->days + 1;
+
+        $sharedHolidays = $cutiModel->getSharedHolidaysInRange($startDate, $endDate);
+        $sharedHolidayCount = count($sharedHolidays);
+
+        $actualLeaveDays = $totalDays - $sharedHolidayCount;
+
+        return max(0, $actualLeaveDays);
+    }
+}

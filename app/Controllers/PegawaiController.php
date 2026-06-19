@@ -5,27 +5,45 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use App\Models\JabatanModel;
 use App\Models\DivisiModel;
+use App\Models\PengajuanCutiModel;
+use App\Models\SaldoCutiModel;
+use CodeIgniter\I18n\Time;
 
-class pegawaiController extends BaseController
+class PegawaiController extends BaseController
 {
     protected $UserModel;
     protected $JabatanModel;
     protected $DivisiModel;
+    protected $CutiModel;
+    protected $SaldoCutiModel;
 
     public function __construct()
     {
-        $this->UserModel = new UserModel();
-        $this->JabatanModel = new JabatanModel();
-        $this->DivisiModel = new DivisiModel();
+        $this->UserModel      = new UserModel();
+        $this->JabatanModel   = new JabatanModel();
+        $this->DivisiModel    = new DivisiModel();
+        $this->CutiModel      = new PengajuanCutiModel();
+        $this->SaldoCutiModel = new SaldoCutiModel();
     }
 
     public function index()
     {
+        $this->SaldoCutiModel->syncSaldoCuti();
+
+        $userId = session()->get('user')['id'] ?? null;
+
         $data = [
-            'title' => 'Data Pegawai',
+            'title'   => 'Data Pegawai',
             'pegawai' => $this->UserModel->getPegawai(),
+            'cuti'    => []
         ];
-        return view('pegawai/index', $data);
+
+        $data['cuti'] = $this->CutiModel
+            ->where('status', 'pending_teman_sejawat')
+            ->where('pegawai_id !=', $userId)
+            ->findAll();
+
+        return view('hrd/pegawai/index', $data);
     }
 
     public function create()
@@ -35,16 +53,13 @@ class pegawaiController extends BaseController
             'validation' => session('validation') ?? \Config\Services::validation(),
             'jabatan' => $this->JabatanModel->findAll(),
             'divisi' => $this->DivisiModel->findAll(),
-
         ];
 
-        return view('pegawai/create', $data);
+        return view('hrd/pegawai/create', $data);
     }
 
     public function save()
     {
-
-
         $rules = [
             'nama'       => 'required',
             'nip'        => 'required',
@@ -56,7 +71,7 @@ class pegawaiController extends BaseController
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->to('/hrd/pegawai/create')
+            return redirect()->to('hrd/pegawai/create')
                 ->withInput()
                 ->with('validation', \Config\Services::validation());
         }
@@ -70,18 +85,21 @@ class pegawaiController extends BaseController
             'no_hp' => $this->request->getVar('no_hp'),
             'alamat' => $this->request->getVar('alamat'),
             'foto' => $this->request->getVar('foto'),
+            'password' => password_hash('123', PASSWORD_DEFAULT),
+            'role' => 'pegawai',
         ]);
 
-        session()->setFlashdata('pesan', 'Data berhasil ditambahkan.');
 
-        return redirect()->to('/hrd/pegawai');
+        session()->setFlashdata('pesan', 'Data pegawai berhasil ditambahkan.');
+
+        return redirect()->to('hrd/pegawai');
     }
 
     public function delete($id)
     {
         $this->UserModel->delete($id);
         session()->setFlashdata('pesan', 'Data berhasil dihapus.');
-        return redirect()->to('/hrd/pegawai');
+        return redirect()->to('hrd/pegawai');
     }
 
     public function edit($id)
@@ -89,18 +107,16 @@ class pegawaiController extends BaseController
         $data = [
             'title' => 'Ubah pegawai',
             'validation' => session('validation') ?? \Config\Services::validation(),
-
-            'pegawai' => $this->UserModel->getPegawai($id),
+            'pegawai' => $this->UserModel->getPegawai($id) ?? $this->UserModel->find($id),
             'jabatan' => $this->JabatanModel->findAll(),
             'divisi' => $this->DivisiModel->findAll(),
         ];
 
-        return view('pegawai/edit', $data);
+        return view('hrd/pegawai/edit', $data);
     }
 
     public function update($id)
     {
-
         $rules = [
             'nama'       => 'required',
             'nip'        => 'required',
@@ -112,7 +128,7 @@ class pegawaiController extends BaseController
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->to('/hrd/pegawai/edit/' . $id)
+            return redirect()->to('hrd/pegawai/edit/' . $id)
                 ->withInput()
                 ->with('validation', \Config\Services::validation());
         }
@@ -131,6 +147,6 @@ class pegawaiController extends BaseController
 
         session()->setFlashdata('pesan', 'Data berhasil diubah.');
 
-        return redirect()->to('/hrd/pegawai');
+        return redirect()->to('hrd/pegawai');
     }
 }

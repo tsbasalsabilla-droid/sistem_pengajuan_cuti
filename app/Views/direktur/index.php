@@ -147,7 +147,26 @@
                                 </td>
                                 <td><?= $c['total_hari']; ?> hari</td>
                                 <td><?= $c['alasan']; ?></td>
-                                <td><?= ucfirst($c['status']); ?></td>
+                                <td>
+                                    <?php
+                                    $status = trim($c['status'] ?? '');
+                                    if ($status === 'approve') $status = 'approved';
+                                    if ($status === '') {
+                                        $approvalModel = new \App\Models\ApprovalModel();
+                                        $log = $approvalModel->where('cuti_id', $c['id'])->where('status', 'approved')->first();
+                                        $status = $log ? 'approved' : 'pending';
+                                    }
+                                    $statusLabel = match ($status) {
+                                        'pending' => 'Menunggu',
+                                        'pending_spv' => 'Menunggu SPV',
+                                        'pending_hrd' => 'Menunggu HRD',
+                                        'pending_direktur' => 'Menunggu Direktur',
+                                        'pending_teman', 'pending_teman_sejawat' => 'Menunggu Teman Sejawat',
+                                        default => ucwords(str_replace('_', ' ', $status))
+                                    };
+                                    echo $statusLabel;
+                                    ?>
+                                </td>
                                 <td>
                                     <a href="/approval/approve-direktur/<?= $c['id']; ?>" class="btn-approve">Approve</a>
                                     <a href="/approval/reject-direktur/<?= $c['id']; ?>" class="btn-reject">Reject</a>

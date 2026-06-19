@@ -146,9 +146,21 @@
                                 </td>
                                 <td><?= $c['total_hari']; ?> hari</td>
                                 <td><?= $c['alasan']; ?></td>
-                                <td><?= ucwords(str_replace('_', ' ', $c['status'])) ?></td>
                                 <td>
-                                    <a href="/approvalspv" class="btn-approve">Approval</a>
+                                    <?php
+                                    $status = trim($c['status'] ?? '');
+                                    if ($status === 'approve') $status = 'approved';
+                                    if ($status === '') {
+                                        $approvalModel = new \App\Models\ApprovalModel();
+                                        $log = $approvalModel->where('cuti_id', $c['id'])->where('status', 'approved')->first();
+                                        $status = $log ? 'approved' : 'pending';
+                                    }
+                                    echo ucwords(str_replace('_', ' ', $status));
+                                    ?>
+                                </td>
+                                <td>
+                                    <a href="/approval/approve-spv/<?= esc($item['id']); ?>" class="btn btn-success">Approve</a>
+                                    <a href="/approval/reject-spv/<?= esc($item['id']); ?>" class="btn btn-danger">Reject</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -175,7 +176,19 @@
                     }
                     ?>
                     <div class="status-box <?= $statusClass; ?>">
-                        <?= strtoupper($cuti['status']); ?>
+                        <?php
+                        $statusLabel = match ($cuti['status']) {
+                            'pending' => 'MENUNGGU',
+                            'pending_spv' => 'MENUNGGU SPV',
+                            'pending_hrd' => 'MENUNGGU HRD',
+                            'pending_direktur' => 'MENUNGGU DIREKTUR',
+                            'pending_teman', 'pending_teman_sejawat' => 'MENUNGGU TEMAN SEJAWAT',
+                            'approve', 'diterima' => 'DISETUJUI',
+                            'rejected', 'ditolak' => 'DITOLAK',
+                            default => strtoupper($cuti['status'])
+                        };
+                        ?>
+                        <?= $statusLabel; ?>
                     </div>
                 </div>
 
@@ -191,13 +204,12 @@
                     <th>Level Approval</th>
                     <th>Status</th>
                     <th>Disetujui Oleh</th>
-                    <th>Waktu Approval</th>
                     <th>Catatan Penolakan</th>
                 </tr>
                 <?php
                 $approvalList = [
-                    'hrd' => 'Pending HRD',
-                    'direktur' => 'Pending Direktur'
+                    'hrd' => 'Menunggu HRD',
+                    'direktur' => 'Menunggu Direktur'
                 ];
                 ?>
                 <?php foreach ($approvalList as $key => $label): ?>
@@ -219,14 +231,13 @@
                                 <?php elseif ($found['status'] == 'rejected'): ?>
                                     <span class="status-box rejected">REJECTED</span>
                                 <?php else: ?>
-                                    <span class="status-box pending">PENDING</span>
+                                    <span class="status-box pending">MENUNGGU</span>
                                 <?php endif; ?>
                             <?php else: ?>
                                 <span class="status-box pending">MENUNGGU</span>
                             <?php endif; ?>
                         </td>
                         <td><?= $found['nama'] ?? '-'; ?></td>
-                        <td><?= $found['approved_at'] ?? '-'; ?></td>
                         <td><?= $found['catatan'] ?? '-'; ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -243,7 +254,6 @@
                             <h4><?= strtoupper($t['level_approval']); ?></h4>
                             <p>Status: <strong><?= strtoupper($t['status']); ?></strong></p>
                             <p>Oleh: <strong><?= $t['nama'] ?? '-'; ?></strong></p>
-                            <p>Waktu: <strong><?= $t['approved_at'] ?? '-'; ?></strong></p>
                             <p>Catatan: <strong><?= $t['catatan'] ?? '-'; ?></strong></p>
                         </div>
                     <?php endforeach; ?>

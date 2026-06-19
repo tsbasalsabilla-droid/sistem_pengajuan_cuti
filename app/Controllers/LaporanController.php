@@ -15,12 +15,14 @@ class LaporanController extends BaseController
 
     public function index()
     {
+        $saldoCutiModel = new \App\Models\SaldoCutiModel();
+        $saldoCutiModel->syncSaldoCuti();
+
         $laporan = $this->LaporanModel->getLaporan();
 
         foreach ($laporan as &$item) {
-            $start = new \DateTime($item['tanggal_mulai']);
-            $end   = new \DateTime($item['tanggal_selesai']);
-            $item['total_hari'] = $start->diff($end)->days + 1;
+            $item['total_hari'] = $this->LaporanModel->calculateActualLeaveDays($item['tanggal_mulai'], $item['tanggal_selesai']);
+            $item['total_hari_kalender'] = (new \DateTime($item['tanggal_selesai']))->diff(new \DateTime($item['tanggal_mulai']))->days + 1;
         }
         unset($item);
 
@@ -32,12 +34,6 @@ class LaporanController extends BaseController
         return view('hrd/laporan/index', $data);
     }
 
-    public function delete($id)
-    {
-        $this->LaporanModel->delete($id);
-        session()->setFlashdata('pesan', 'Data berhasil dihapus.');
-        return redirect()->to('/hrd/laporan');
-    }
 
     public function exportExcel()
     {
@@ -66,16 +62,16 @@ class LaporanController extends BaseController
         echo '<th class="text-center">Tanggal Mulai</th>';
         echo '<th class="text-center">Tanggal Selesai</th>';
         echo '<th class="text-left">Alasan</th>';
-        echo '<th class="text-center">Total Hari</th>';
+        echo '<th class="text-center">Total Hari (Kalender)</th>';
+        echo '<th class="text-center">Total Hari (Dikurangi Cuti Bersama)</th>';
         echo '<th class="text-center">Status</th>';
         echo '</tr>';
 
         $no = 1;
 
         foreach ($laporan as $l) {
-            $start = new \DateTime($l['tanggal_mulai']);
-            $end   = new \DateTime($l['tanggal_selesai']);
-            $totalHari = $start->diff($end)->days + 1;
+            $totalHariKalender = (new \DateTime($l['tanggal_selesai']))->diff(new \DateTime($l['tanggal_mulai']))->days + 1;
+            $totalHariAktual = $this->LaporanModel->calculateActualLeaveDays($l['tanggal_mulai'], $l['tanggal_selesai']);
 
             echo '<tr>';
             echo '<td class="text-center">' . $no++ . '</td>';
@@ -84,13 +80,21 @@ class LaporanController extends BaseController
             echo '<td class="text-center">' . htmlspecialchars($l['tanggal_mulai']) . '</td>';
             echo '<td class="text-center">' . htmlspecialchars($l['tanggal_selesai']) . '</td>';
             echo '<td class="text-left">' . htmlspecialchars($l['alasan']) . '</td>';
-            echo '<td class="text-center">' . $totalHari . '</td>';
+            echo '<td class="text-center">' . $totalHariKalender . '</td>';
+            echo '<td class="text-center">' . $totalHariAktual . '</td>';
             echo '<td class="text-center">' . htmlspecialchars($l['status']) . '</td>';
             echo '</tr>';
         }
-
         echo '</table>';
         echo '</body></html>';
         exit;
+    }
+
+
+    public function delete($id)
+    {
+        $this->LaporanModel->delete($id);
+        session()->setFlashdata('pesan', 'Data berhasil dihapus.');
+        return redirect()->to('/hrd/laporan');
     }
 }

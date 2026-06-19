@@ -5,7 +5,7 @@
         box-sizing: border-box;
     }
 
-        .sidebar {
+    .sidebar {
         width: 260px;
         height: 100vh;
         background: linear-gradient(180deg, #6f4e37, #8b6b52);
@@ -14,7 +14,7 @@
         top: 0;
         padding: 20px 18px;
         box-shadow: 4px 0 20px rgba(0, 0, 0, 0.08);
-    
+
     }
 
     body {
@@ -175,54 +175,54 @@
     </div>
 
     <?php
-$userRole = session()->get('user')['role'] ?? 'karyawan';
-$currentUrl = current_url(true)->getPath();
-?>
+    $userRole = session()->get('user')['role'] ?? 'karyawan';
+    $currentUrl = current_url(true)->getPath();
+    ?>
 
-<?php if ($userRole == 'spv'): ?>
+    <?php if ($userRole == 'spv'): ?>
 
-    <a href="/spv/dashboard"
-   class="<?= str_contains($currentUrl, 'spv/dashboard') ? 'active' : ''; ?>">
-    <i class="bi bi-speedometer2"></i>
-    Dashboard
-</a>
+        <a href="/spv/dashboard"
+            class="<?= str_contains($currentUrl, 'spv/dashboard') ? 'active' : ''; ?>">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
+        </a>
 
-<a href="/spv/cuti/create"
-   class="<?= str_contains($currentUrl, 'spv/cuti/create') ? 'active' : ''; ?>">
-    <i class="bi bi-file-earmark-plus"></i>
-    Pengajuan Cuti
-</a>
+        <a href="/spv/cuti/create"
+            class="<?= str_contains($currentUrl, 'spv/cuti/create') ? 'active' : ''; ?>">
+            <i class="bi bi-file-earmark-plus"></i>
+            Pengajuan Cuti
+        </a>
 
-<a href="/spv/cuti"
-   class="<?= str_contains($currentUrl, 'spv/cuti') ? 'active' : ''; ?>">
-    <i class="bi bi-clock-history"></i>
-    History Pengajuan
-</a>
+        <a href="/spv/cuti"
+            class="<?= str_contains($currentUrl, 'spv/cuti') ? 'active' : ''; ?>">
+            <i class="bi bi-clock-history"></i>
+            History Pengajuan
+        </a>
 
-<a href="/approvalspv"
-   class="<?= str_contains($currentUrl, 'approvalspv') ? 'active' : ''; ?>">
-    <i class="bi bi-building-check"></i>
-    Approval
-</a>
+        <a href="/approvalspv"
+            class="<?= str_contains($currentUrl, 'approvalspv') ? 'active' : ''; ?>">
+            <i class="bi bi-building-check"></i>
+            Approval
+        </a>
 
-<?php endif; ?>
+    <?php endif; ?>
 
-<!-- DIREKTUR -->
-<?php if ($userRole == 'direktur'): ?>
+    <!-- DIREKTUR -->
+    <?php if ($userRole == 'direktur'): ?>
 
-    <a href="/direktur/dashboard"
-   class="<?= str_contains($currentUrl, 'direktur/dashboard') ? 'active' : ''; ?>">
-    <i class="bi bi-speedometer2"></i>
-    Dashboard
-</a>
+        <a href="/direktur/dashboard"
+            class="<?= str_contains($currentUrl, 'direktur/dashboard') ? 'active' : ''; ?>">
+            <i class="bi bi-speedometer2"></i>
+            Dashboard
+        </a>
 
-<a href="/direktur"
-   class="<?= $currentUrl == 'direktur' ? 'active' : ''; ?>">
-    <i class="bi bi-building-check"></i>
-    Approval
-</a>
+        <a href="/direktur"
+            class="<?= $currentUrl == 'direktur' ? 'active' : ''; ?>">
+            <i class="bi bi-building-check"></i>
+            Approval
+        </a>
 
-<?php endif; ?>
+    <?php endif; ?>
 
     <div class="menu-title" style="margin-top: 30px;">
         User

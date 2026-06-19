@@ -4,25 +4,31 @@ namespace App\Controllers;
 
 use App\Models\ApprovalModel;
 use App\Models\PengajuanCutiModel;
+use App\Models\DetailStatusCutiModel;
 
 class ApprovalhrdController extends BaseController
 {
     protected $cutiModel;
     protected $approvalModel;
+    protected $detailModel;
 
     public function __construct()
     {
         $this->cutiModel = new PengajuanCutiModel();
         $this->approvalModel = new ApprovalModel();
+        $this->detailModel = new DetailStatusCutiModel();
     }
 
     public function index()
     {
         $data['cuti'] = $this->cutiModel
-            ->where('status', 'pending')
+            ->select('pengajuan_cuti.*, pegawai.nama AS nama_pegawai')
+            ->join('pegawai', 'pegawai.id = pengajuan_cuti.pegawai_id', 'left')
+            ->whereIn('pengajuan_cuti.status', ['pending', 'pending_hrd'])
+            ->orderBy('pengajuan_cuti.id', 'DESC')
             ->findAll();
 
-        return view('approval/index', $data);
+        return view('hrd/approvalhrd/indexhrd', $data);
     }
 
     public function approve($id)
@@ -33,17 +39,17 @@ class ApprovalhrdController extends BaseController
         }
 
         $this->cutiModel->update($id, [
-            'status' => 'approve'
+            'status' => 'pending_direktur'
         ]);
 
-        $this->approvalModel->save([
-            'cuti_id' => $id,
-            'approver_id' => 6,
-            'role_approver' => 'hrd',
-            'status' => 'approved',
-            'catatan' => 'Disetujui HRD'
+        $this->detailModel->save([
+            'pengajuan_id'   => $id,
+            'approved_by'    => session()->get('user')['id'] ?? null,
+            'level_approval' => 'hrd',
+            'status'         => 'approved',
+            'catatan'        => 'Disetujui HRD'
         ]);
 
-        return redirect()->to('/approvalhrd')->with('success', 'Pengajuan cuti disetujui!');
+        return redirect()->to(base_url('hrd/approvalhrd/indexhrd'));
     }
 }

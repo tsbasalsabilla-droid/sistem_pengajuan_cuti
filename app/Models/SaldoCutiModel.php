@@ -6,7 +6,8 @@ use CodeIgniter\Model;
 
 class SaldoCutiModel extends Model
 {
-    protected $table = 'saldo_cuti';
+    protected $table = 'pengajuan_cuti';
+    protected $primaryKey = 'id';
 
     protected $allowedFields = [
         'pegawai_id',
@@ -15,4 +16,9 @@ class SaldoCutiModel extends Model
         'cuti_terpakai',
         'sisa_cuti'
     ];
+
+    public function syncSaldoCuti()
+    {
+        return true;
+    }
 }

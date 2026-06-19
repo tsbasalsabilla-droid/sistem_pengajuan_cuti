@@ -13,17 +13,21 @@ class Spv extends BaseController
         $this->cutiModel = new PengajuanCutiModel();
     }
 
-    // Approval SPV
     public function index()
     {
+        $userId = session()->get('user')['id'];
+
+
         $data['cuti'] = $this->cutiModel
+            ->select('pengajuan_cuti.*, pegawai.nama AS nama_pegawai')
+            ->join('pegawai', 'pegawai.id = pengajuan_cuti.pegawai_id', 'left')
             ->where('status', 'pending_spv')
+            ->where('pengajuan_cuti.pegawai_id !=', $userId)
             ->findAll();
 
-        return view('spv/index', $data);
+        return view('approval/index', $data);
     }
 
-    // Approve pengajuan
     public function approve($id)
     {
         $cuti = $this->cutiModel->find($id);
@@ -31,23 +35,22 @@ class Spv extends BaseController
             return redirect()->back()->with('error', 'Anda tidak bisa menyetujui pengajuan sendiri.');
         }
 
-        // update status cuti
         $this->cutiModel->update($id, [
-            'status' => 'approve'
+            'status' => 'pending_hrd'
         ]);
 
-        // insert approval log
         $approvalModel = new \App\Models\ApprovalModel();
         $approvalModel->save([
-            'cuti_id' => $id,
-            'role' => 'spv',
-            'action' => 'approve'
+            'cuti_id'       => $id,
+            'approver_id'   => session()->get('user')['id'] ?? 0,
+            'role_approver' => 'spv',
+            'status'        => 'rejected',
+            'catatan'       => 'Ditolak oleh SPV'
         ]);
 
         return redirect()->to('/spv')->with('success', 'Pengajuan cuti disetujui!');
     }
 
-    // Reject pengajuan
     public function reject($id)
     {
         $cuti = $this->cutiModel->find($id);
@@ -55,12 +58,10 @@ class Spv extends BaseController
             return redirect()->back()->with('error', 'Anda tidak bisa menolak pengajuan sendiri.');
         }
 
-        // update status cuti
         $this->cutiModel->update($id, [
             'status' => 'rejected'
         ]);
 
-        // insert approval log
         $approvalModel = new \App\Models\ApprovalModel();
         $approvalModel->save([
             'cuti_id' => $id,
@@ -71,19 +72,39 @@ class Spv extends BaseController
         return redirect()->to('/spv')->with('success', 'Pengajuan cuti ditolak!');
     }
 
-    // dashboard SPV
     public function dashboard()
     {
-        $pending = $this->cutiModel->where('status', 'pending')->countAllResults();
-        $approved = $this->cutiModel->where('status', 'approve')->countAllResults();
-        $rejected = $this->cutiModel->where('status', 'rejected')->countAllResults();
+        $userId = (int) session()->get('user')['id'];
+
+        if (empty($userId)) {
+            return redirect()->to('/auth/login')->with('error', 'Sesi Anda telah habis, silakan login kembali.');
+        }
+
+        $pending = $this->cutiModel
+            ->where('pengajuan_cuti.pegawai_id !=', $userId)
+            ->where('pengajuan_cuti.status', 'pending_spv')
+            ->countAllResults();
+
+        $approved = $this->cutiModel
+            ->where('pengajuan_cuti.pegawai_id !=', $userId)
+            ->where('pengajuan_cuti.status', 'approved')
+            ->countAllResults();
+
+        $rejected = $this->cutiModel
+            ->where('pengajuan_cuti.pegawai_id !=', $userId)
+            ->where('pengajuan_cuti.status', 'rejected')
+            ->countAllResults();
+
         $approvedCuti = $this->cutiModel
-            ->where('status', 'approve')
+            ->select('pengajuan_cuti.*, pegawai.nama AS nama_pegawai')
+            ->join('pegawai', 'pegawai.id = pengajuan_cuti.pegawai_id', 'left')
+            ->where('pengajuan_cuti.pegawai_id !=', $userId)
+            ->whereIn('pengajuan_cuti.status', ['pending_hrd', 'pending_direktur', 'approved'])
             ->findAll();
 
         $data = [
-            'cuti' => $approvedCuti,
-            'pending' => $pending,
+            'cuti'     => $approvedCuti,
+            'pending'  => $pending,
             'approved' => $approved,
             'rejected' => $rejected
         ];

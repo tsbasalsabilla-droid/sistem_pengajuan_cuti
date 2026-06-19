@@ -3,20 +3,20 @@
 namespace App\Controllers;
 
 use App\Models\PengajuanCutiModel;
-use App\Models\SaldoCutiModel;
 use App\Models\DetailStatusCutiModel;
+use App\Models\PegawaiModel;
 
 class CutiSpvController extends BaseController
 {
     protected $pengajuanModel;
-    protected $saldoModel;
     protected $detailModel;
+    protected $pegawaiModel;
 
     public function __construct()
     {
         $this->pengajuanModel = new PengajuanCutiModel();
-        $this->saldoModel = new SaldoCutiModel();
         $this->detailModel = new DetailStatusCutiModel();
+        $this->pegawaiModel = new PegawaiModel();
     }
 
     public function index()
@@ -53,37 +53,54 @@ class CutiSpvController extends BaseController
                 ->with('error', 'Tanggal tidak valid');
         }
 
-        $mulai = strtotime($tanggalMulai);
-        $selesai = strtotime($tanggalSelesai);
 
-        $totalHari = (($selesai - $mulai) / 86400) + 1;
+        $start = new \DateTime($tanggalMulai);
+        $end   = new \DateTime($tanggalSelesai);
+        $end->modify('+1 day');
+        $interval  = new \DateInterval('P1D');
+        $dateRange = new \DatePeriod($start, $interval, $end);
 
-        $saldo = $this->saldoModel
-            ->where('pegawai_id', $userId)
-            ->first();
 
-        if (!$saldo) {
-            $this->saldoModel->insert([
-                'pegawai_id' => $userId,
-                'tahun' => date('Y'),
-                'total_cuti' => 12,
-                'cuti_terpakai' => 0,
-                'sisa_cuti' => 12,
-            ]);
+        $daftarLibur = [
+            '2026-06-16',
+        ];
 
-            $saldo = $this->saldoModel
-                ->where('pegawai_id', $userId)
-                ->first();
+        $totalHari = 0;
+
+        foreach ($dateRange as $date) {
+            $tanggalSekarang = $date->format('Y-m-d');
+            $hariMingguSabtu = $date->format('w');
+
+
+            if ($hariMingguSabtu == 0 || $hariMingguSabtu == 6) {
+                continue;
+            }
+
+
+            if (in_array($tanggalSekarang, $daftarLibur)) {
+                continue;
+            }
+
+            $totalHari++;
         }
 
-        if (!$saldo) {
+        if ($totalHari <= 0) {
             return redirect()->back()
-                ->with('error', 'Saldo cuti tidak ditemukan');
+                ->with('error', 'Tanggal yang Anda pilih adalah hari libur/cuti bersama.');
         }
 
-        if ($saldo['sisa_cuti'] < $totalHari) {
+
+        $pegawai = $this->pegawaiModel->find($userId);
+
+        if (!$pegawai) {
             return redirect()->back()
-                ->with('error', 'Saldo cuti tidak cukup');
+                ->with('error', 'Data pegawai tidak ditemukan');
+        }
+
+
+        if ($pegawai['saldo_cuti'] < $totalHari) {
+            return redirect()->back()
+                ->with('error', 'Saldo cuti tidak cukup. Sisa saldo Anda: ' . $pegawai['saldo_cuti'] . ' hari.');
         }
 
         $data = [
@@ -117,17 +134,5 @@ class CutiSpvController extends BaseController
             ->findAll();
 
         return view('spv/cuti/detail', $data);
-    }
-
-    public function history()
-    {
-        $userId = session()->get('user')['id'];
-
-        $data['cuti'] = $this->pengajuanModel
-            ->where('pegawai_id', $userId)
-            ->orderBy('id', 'DESC')
-            ->findAll();
-
-        return view('spv/cuti/index', $data);
     }
 }

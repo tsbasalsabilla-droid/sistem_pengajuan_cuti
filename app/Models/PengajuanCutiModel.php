@@ -14,6 +14,7 @@ class PengajuanCutiModel extends Model
         'tanggal_selesai',
         'total_hari',
         'alasan',
-        'status'
+        'status',
+        'catatan'
     ];
 }

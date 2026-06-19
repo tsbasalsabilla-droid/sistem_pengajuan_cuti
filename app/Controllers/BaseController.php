@@ -42,6 +42,7 @@ abstract class BaseController extends Controller
         parent::initController($request, $response, $logger);
 
         // Load session dan user
+        $this->session = session();
         $this->session = service('session');
         $this->user = $this->session->get('user') ?? null;
     }

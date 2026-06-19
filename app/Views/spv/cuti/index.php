@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,6 +90,7 @@
                 <tr>
                     <th>Tanggal</th>
                     <th>Total Hari</th>
+                    <th>Alasan</th>
                     <th>Status</th>
                     <th>Aksi</th>
                 </tr>
@@ -103,7 +105,27 @@
                             <?= $c['total_hari']; ?> Hari
                         </td>
                         <td>
-                            <?= ucwords(str_replace('_', ' ', $c['status'])) ?>
+                            <?= $c['alasan']; ?>
+                        </td>
+                        <td>
+                            <?php
+                            $status = trim($c['status'] ?? '');
+                            if ($status === 'approve') $status = 'approved';
+                            if ($status === '') {
+                                $approvalModel = new \App\Models\ApprovalModel();
+                                $log = $approvalModel->where('cuti_id', $c['id'])->where('status', 'approved')->first();
+                                $status = $log ? 'approved' : 'pending';
+                            }
+                            $statusLabel = match ($status) {
+                                'pending' => 'Menunggu',
+                                'pending_spv' => 'Menunggu SPV',
+                                'pending_hrd' => 'Menunggu HRD',
+                                'pending_direktur' => 'Menunggu Direktur',
+                                'pending_teman', 'pending_teman_sejawat' => 'Menunggu Teman Sejawat',
+                                default => ucwords(str_replace('_', ' ', $status))
+                            };
+                            echo $statusLabel;
+                            ?>
                         </td>
                         <td>
                             <a class="detail-link" href="/spv/cuti/detail/<?= $c['id']; ?>">Detail</a>
@@ -114,4 +136,5 @@
         </table>
     </div>
 </body>
+
 </html>

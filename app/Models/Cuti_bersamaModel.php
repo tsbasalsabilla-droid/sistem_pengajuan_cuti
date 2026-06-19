@@ -20,4 +20,30 @@ class Cuti_bersamaModel extends Model
 
         return $this->where(['id' => $id])->first();
     }
+
+    public function getAllSharedHolidayDates()
+    {
+        return $this->select('tanggal')
+            ->findAll();
+    }
+
+    public function isSharedHoliday($date)
+    {
+        return $this->where('tanggal', $date)->first() !== null;
+    }
+
+    public function countSharedHolidaysInRange($startDate, $endDate)
+    {
+        return $this->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->countAllResults();
+    }
+
+    public function getSharedHolidaysInRange($startDate, $endDate)
+    {
+        return $this->where('tanggal >=', $startDate)
+            ->where('tanggal <=', $endDate)
+            ->select('tanggal')
+            ->findAll();
+    }
 }

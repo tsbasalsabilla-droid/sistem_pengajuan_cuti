@@ -6,10 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Direktur</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <style>
@@ -290,7 +287,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Pegawai ID</th>
+                                <th>Nama Pegawai</th>
                                 <th>Periode Cuti</th>
                                 <th>Total Hari</th>
                                 <th>Alasan</th>
@@ -302,7 +299,7 @@
                             <?php foreach ($cuti as $c): ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
-                                    <td><?= $c['pegawai_id']; ?></td>
+                                    <td><?= $c['nama_pegawai']; ?></td>
                                     <td>
                                         <?= date('d/m/Y', strtotime($c['tanggal_mulai'])); ?> -
                                         <?= date('d/m/Y', strtotime($c['tanggal_selesai'])); ?>
@@ -310,8 +307,28 @@
                                     <td><?= $c['total_hari']; ?> hari</td>
                                     <td><?= substr($c['alasan'], 0, 50); ?><?= strlen($c['alasan']) > 50 ? '...' : ''; ?></td>
                                     <td>
-                                        <span class="badge-status badge-<?= strtolower($c['status']); ?>">
-                                            <?= ucfirst($c['status']); ?>
+                                        <?php
+                                        $status = trim($c['status'] ?? '');
+                                        if ($status === 'approve') $status = 'approved';
+                                        if ($status === '') {
+                                            $approvalModel = new \App\Models\ApprovalModel();
+                                            $log = $approvalModel->where('cuti_id', $c['id'])->where('status', 'approved')->first();
+                                            $status = $log ? 'approved' : 'pending';
+                                        }
+                                        $badgeClass = strtolower(str_replace('_', '-', $status));
+                                        ?>
+                                        <span class="badge-status badge-<?= $badgeClass; ?>">
+                                            <?php
+                                            $statusLabel = match ($status) {
+                                                'pending' => 'Menunggu',
+                                                'pending_spv' => 'Menunggu SPV',
+                                                'pending_hrd' => 'Menunggu HRD',
+                                                'pending_direktur' => 'Menunggu Direktur',
+                                                'pending_teman', 'pending_teman_sejawat' => 'Menunggu Teman Sejawat',
+                                                default => ucwords(str_replace('_', ' ', $status))
+                                            };
+                                            ?>
+                                            <?= $statusLabel; ?>
                                         </span>
                                     </td>
                                 </tr>

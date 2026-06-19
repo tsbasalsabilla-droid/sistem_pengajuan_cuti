@@ -7,7 +7,6 @@ use CodeIgniter\Model;
 class ApprovalModel extends Model
 {
     protected $table = 'approval_logs';
-
     protected $primaryKey = 'id';
 
     protected $allowedFields = [
@@ -17,4 +16,8 @@ class ApprovalModel extends Model
         'status',
         'catatan'
     ];
+
+    protected $useTimestamps = true;
+    protected $createdField  = 'created_at';
+    protected $updatedField  = '';
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +17,7 @@
             transition: margin-left 0.3s ease, width 0.3s ease;
         }
 
-        .sidebar.collapsed + .content {
+        .sidebar.collapsed+.content {
             margin-left: 82px;
             width: calc(100% - 82px);
         }
@@ -191,6 +192,7 @@
         }
     </style>
 </head>
+
 <body>
     <?= view('layout/sidebar'); ?>
 
@@ -246,7 +248,7 @@
                         <thead>
                             <tr>
                                 <th>#</th>
-                                <th>Pegawai ID</th>
+                                <th>Nama Pegawai</th>
                                 <th>Periode Cuti</th>
                                 <th>Total Hari</th>
                                 <th>Alasan</th>
@@ -258,7 +260,7 @@
                             <?php foreach ($cuti as $c): ?>
                                 <tr>
                                     <td><?= $no++; ?></td>
-                                    <td><?= $c['pegawai_id']; ?></td>
+                                    <td><?= $c['nama_pegawai'] ?? 'Tidak Diketahui'; ?></td>
                                     <td>
                                         <?= date('d/m/Y', strtotime($c['tanggal_mulai'])); ?> -
                                         <?= date('d/m/Y', strtotime($c['tanggal_selesai'])); ?>
@@ -266,8 +268,26 @@
                                     <td><?= $c['total_hari']; ?> hari</td>
                                     <td><?= substr($c['alasan'], 0, 50); ?><?= strlen($c['alasan']) > 50 ? '...' : ''; ?></td>
                                     <td>
-                                        <span class="badge-status badge-<?= str_replace('_', '-', strtolower($c['status'])); ?>">
-                                            <?= ucwords(str_replace('_', ' ', $c['status'])) ?>
+                                        <?php
+                                        $status = trim($c['status'] ?? '');
+                                        if ($status === 'approve') $status = 'approved';
+
+                                        if ($status === '') {
+                                            $status = 'pending';
+                                        }
+                                        $badgeClass = str_replace('_', '-', strtolower($status));
+                                        ?>
+                                        <span class="badge-status badge-<?= $badgeClass; ?>">
+                                            <?php
+                                            echo match ($status) {
+                                                'pending' => 'Menunggu',
+                                                'pending_spv' => 'Menunggu SPV',
+                                                'pending_hrd' => 'Menunggu HRD',
+                                                'pending_direktur' => 'Menunggu Direktur',
+                                                'pending_teman', 'pending_teman_sejawat' => 'Menunggu Teman Sejawat',
+                                                default => ucwords(str_replace('_', ' ', $status))
+                                            };
+                                            ?>
                                         </span>
                                     </td>
                                 </tr>
@@ -279,4 +299,5 @@
         </div>
     </div>
 </body>
+
 </html>

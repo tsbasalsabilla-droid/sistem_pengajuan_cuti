@@ -13,7 +13,7 @@
         <h3>Sisa Saldo Cuti</h3>
 
         <h1>
-            <?= $saldo['sisa_cuti'] ?? 0; ?>
+            <?= $saldo['saldo_cuti'] ?? 0; ?>
         </h1>
 
     </div>

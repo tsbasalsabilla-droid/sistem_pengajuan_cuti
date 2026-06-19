@@ -22,8 +22,8 @@ class UserModel extends Model
     public function getPegawai($id = false)
     {
         $builder = $this->db->table('pegawai')
-            ->join('jabatan', 'jabatan.id = pegawai.id_jabatan')
-            ->join('divisi', 'divisi.id = pegawai.id_divisi')
+            ->join('jabatan', 'jabatan.id = pegawai.id_jabatan', 'left')
+            ->join('divisi', 'divisi.id = pegawai.id_divisi', 'left')
             ->select('pegawai.*, jabatan.jabatan, divisi.nama_divisi');
 
         if ($id === false) {

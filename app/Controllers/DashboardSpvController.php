@@ -18,38 +18,34 @@ class DashboardSpvController extends BaseController
 
     public function index()
     {
-        // user SPV
-        $userId = 3;
+        $userId = session()->get('user')['id'];
 
-        $saldo = $this->saldoModel
-            ->where('pegawai_id', $userId)
-            ->first();
 
-        $pengajuanTerakhir = $this->pengajuanModel
-            ->where('pegawai_id', $userId)
-            ->orderBy('id', 'DESC')
-            ->first();
+        $saldo = null;
+        $modelPending  = new \App\Models\PengajuanCutiModel();
+        $modelApproved = new \App\Models\PengajuanCutiModel();
+        $modelRejected = new \App\Models\PengajuanCutiModel();
+        $modelCuti     = new \App\Models\PengajuanCutiModel();
 
-        $statusAktif = $this->pengajuanModel
-            ->where('pegawai_id', $userId)
-            ->whereIn('status', [
-                'pending_hrd',
-                'pending_direktur'
-            ])
-            ->orderBy('id', 'DESC')
-            ->first();
+        $pending = $modelPending->where('status', 'pending_spv')->countAllResults();
 
-        $jumlahCuti = $this->pengajuanModel
-            ->selectSum('total_hari')
-            ->where('pegawai_id', $userId)
-            ->where('status', 'diterima')
-            ->first();
+        $approved = $modelApproved->whereIn('status', ['pending_hrd', 'pending_direktur', 'approve', 'approved', 'diterima'])->countAllResults();
 
-        return view('spv/dashboard/index', [
-            'saldo' => $saldo,
-            'pengajuanTerakhir' => $pengajuanTerakhir,
-            'statusAktif' => $statusAktif,
-            'jumlahCuti' => $jumlahCuti
+        $rejected = $modelRejected->whereIn('status', ['rejected', 'ditolak'])->countAllResults();
+
+
+        $cuti = $modelCuti->select('pengajuan_cuti.*, pegawai.nama as nama_pegawai')
+            ->join('pegawai', 'pegawai.id = pengajuan_cuti.pegawai_id')
+            ->whereIn('pengajuan_cuti.status', ['pending_hrd', 'pending_direktur', 'approve', 'approved', 'diterima'])
+            ->orderBy('pengajuan_cuti.id', 'DESC')
+            ->findAll(10);
+
+        return view('spv/dashboard', [
+            'saldo'    => $saldo,
+            'pending'  => $pending,
+            'approved' => $approved,
+            'rejected' => $rejected,
+            'cuti'     => $cuti
         ]);
     }
 }

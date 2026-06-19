@@ -13,13 +13,13 @@ class Auth extends BaseController
         $this->pegawaiModel = new PegawaiModel();
     }
 
-    // Form login
+
     public function login()
     {
         return view('auth/login');
     }
 
-    // Proses login
+
     public function doLogin()
     {
         $rules = [
@@ -69,27 +69,27 @@ class Auth extends BaseController
                 $redirectTo = '/direktur/dashboard';
                 break;
             default:
-                $redirectTo = '/cuti';
+                $redirectTo = '/dashboard';
                 break;
         }
 
         return redirect()->to($redirectTo)->with('success', 'Login berhasil!');
     }
 
-    // Logout
+
     public function logout()
     {
         $this->session->destroy();
         return redirect()->to('/auth/login')->with('success', 'Logout berhasil!');
     }
 
-    // Form register
+
     public function register()
     {
         return view('auth/register');
     }
 
-    // Proses register
+
     public function doRegister()
     {
         $rules = [
