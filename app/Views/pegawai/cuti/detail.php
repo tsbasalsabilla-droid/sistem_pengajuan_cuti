@@ -296,25 +296,139 @@
                 </td>
             </tr>
 
+            <?php
+            $dbApproval = new \App\Models\ApprovalModel();
+            $idCuti = $cuti['id'] ?? $id;
+            $statusUtama = $cuti['status'];
+
+            $checkSpv = $dbApproval->where('cuti_id', $idCuti)->where('role_approver', 'spv')->first();
+            $checkHrd = $dbApproval->where('cuti_id', $idCuti)->where('role_approver', 'hrd')->first();
+            $checkDir = $dbApproval->where('cuti_id', $idCuti)->where('role_approver', 'direktur')->first();
+            ?>
+
             <tr>
                 <td>Menunggu SPV</td>
-                <td><span class="status-box <?= $spvClass; ?>"><?= $spvStatus; ?></span></td>
-                <td><?= !empty($detailSpv['nama']) && $detailSpv['nama'] !== '-' ? $detailSpv['nama'] : ($spvStatus === 'DITOLAK' ? '-' : '-'); ?></td>
-                <td><?= $detailSpv['catatan'] ?? '-'; ?></td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['pending_hrd', 'pending_direktur', 'approve', 'approved', 'diterima']) || ($checkSpv && $checkSpv['status'] === 'approved')) {
+                        echo '<span class="status-box approved">DISETUJUI</span>';
+                    } elseif (($checkSpv && $checkSpv['status'] === 'rejected') || ($statusUtama === 'rejected' && ($checkSpv || isset($detailSpv['catatan'])))) {
+                        echo '<span class="status-box rejected">DITOLAK</span>';
+                    } else {
+                        echo '<span class="status-box pending">MENUNGGU</span>';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['pending_hrd', 'pending_direktur', 'approve', 'approved', 'diterima']) || ($checkSpv && $checkSpv['status'] === 'approved')) {
+                        $spvLogData = $dbApproval->select('pegawai.nama')
+                            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+                            ->where('cuti_id', $idCuti)
+                            ->where('role_approver', 'spv')
+                            ->first();
+                        echo esc($spvLogData['nama'] ?? 'Supervisor');
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['pending_hrd', 'pending_direktur', 'approve', 'approved', 'diterima'])) {
+                        echo '-';
+                    } elseif ($checkSpv && $checkSpv['status'] === 'rejected') {
+                        echo esc($checkSpv['catatan']);
+                    } elseif ($statusUtama === 'rejected' && isset($detailSpv['catatan'])) {
+                        echo esc($detailSpv['catatan']);
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </td>
             </tr>
 
             <tr>
                 <td>Menunggu HRD</td>
-                <td><span class="status-box <?= $hrdClass; ?>"><?= $hrdStatus; ?></span></td>
-                <td><?= !empty($detailHrd['nama']) && $detailHrd['nama'] !== '-' ? $detailHrd['nama'] : ($hrdStatus === 'DITOLAK' ? '-' : '-'); ?></td>
-                <td><?= $detailHrd['catatan'] ?? '-'; ?></td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['pending_direktur', 'approve', 'approved', 'diterima']) || ($checkHrd && $checkHrd['status'] === 'approved')) {
+                        echo '<span class="status-box approved">DISETUJUI</span>';
+                    } elseif (($checkHrd && $checkHrd['status'] === 'rejected') || ($statusUtama === 'rejected' && $statusUtama !== 'pending_spv' && $checkHrd)) {
+                        echo '<span class="status-box rejected">DITOLAK</span>';
+                    } else {
+                        echo '<span class="status-box pending">MENUNGGU</span>';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['pending_direktur', 'approve', 'approved', 'diterima']) || ($checkHrd && $checkHrd['status'] === 'approved')) {
+                        // Mengambil nama langsung dari log tracking array yang murni lolos dari database
+                        $searchHrd = array_filter($tracking, fn($t) => strtolower($t['level_approval'] ?? $t['role_approver'] ?? '') === 'hrd');
+                        $hrdData = reset($searchHrd);
+
+                        echo esc($hrdData['nama'] ?? 'HRD Team');
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['pending_direktur', 'approve', 'approved', 'diterima'])) {
+                        echo '-';
+                    } elseif ($checkHrd && $checkHrd['status'] === 'rejected') {
+                        echo esc($checkHrd['catatan']);
+                    } elseif ($statusUtama === 'rejected' && isset($detailHrd['catatan'])) {
+                        echo esc($detailHrd['catatan']);
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </td>
             </tr>
 
             <tr>
                 <td>Menunggu Direktur</td>
-                <td><span class="status-box <?= $dirClass; ?>"><?= $dirStatus; ?></span></td>
-                <td><?= !empty($detailDir['nama']) && $detailDir['nama'] !== '-' ? $detailDir['nama'] : ($dirStatus === 'DITOLAK' ? '-' : '-'); ?></td>
-                <td><?= $detailDir['catatan'] ?? '-'; ?></td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['approve', 'approved', 'diterima']) || ($checkDir && $checkDir['status'] === 'approved')) {
+                        echo '<span class="status-box approved">DISETUJUI</span>';
+                    } elseif (($checkDir && $checkDir['status'] === 'rejected') || ($statusUtama === 'rejected' && $checkDir)) {
+                        echo '<span class="status-box rejected">DITOLAK</span>';
+                    } else {
+                        echo '<span class="status-box pending">MENUNGGU</span>';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['approve', 'approved', 'diterima']) || ($checkDir && $checkDir['status'] === 'approved')) {
+                        $dirLogData = $dbApproval->select('pegawai.nama')
+                            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+                            ->where('cuti_id', $idCuti)
+                            ->where('role_approver', 'direktur')
+                            ->first();
+                        echo esc($dirLogData['nama'] ?? 'Direktur');
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </td>
+                <td>
+                    <?php
+                    if (in_array($statusUtama, ['approve', 'approved', 'diterima'])) {
+                        echo '-';
+                    } elseif ($checkDir && $checkDir['status'] === 'rejected') {
+                        echo esc($checkDir['catatan']);
+                    } elseif ($statusUtama === 'rejected' && isset($detailDir['catatan'])) {
+                        echo esc($detailDir['catatan']);
+                    } else {
+                        echo '-';
+                    }
+                    ?>
+                </td>
             </tr>
         </tbody>
     </table>
@@ -323,29 +437,132 @@
 <div class="card">
     <h3>Timeline Approval</h3>
     <div class="timeline">
-        <?php if (!empty($tracking)): ?>
-            <?php
-            $hasVisibleTimeline = false;
-            foreach ($tracking as $t):
-                $namaEksekutor = isset($t['nama']) ? trim($t['nama']) : '';
+        <?php
+        $dbApproval = new \App\Models\ApprovalModel();
+        $idCuti = $cuti['id'] ?? $id;
+        $statusUtama = $cuti['status'];
 
-                if ($namaEksekutor === '' || $namaEksekutor === '-' || empty($namaEksekutor)) {
-                    continue;
-                }
-                $hasVisibleTimeline = true;
-            ?>
-                <div class="timeline-item">
-                    <h4><?= strtoupper($t['level_approval'] === 'teman' ? 'TEMAN SEJAWAT' : $t['level_approval']); ?></h4>
-                    <p>Status: <strong><?= strtoupper($t['status']); ?></strong></p>
-                    <p>Oleh: <strong><?= esc($namaEksekutor); ?></strong></p>
-                    <p>Catatan: <strong><?= esc($t['catatan'] ?? '-'); ?></strong></p>
-                </div>
+        $temanApprovals = $dbApproval->select($dbApproval->table . '.*, pegawai.nama as nama_approver')
+            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+            ->where('cuti_id', $idCuti)
+            ->where('role_approver', 'teman')
+            ->orderBy($dbApproval->table . '.created_at', 'ASC')
+            ->findAll();
+
+        $spvLogData = $dbApproval->select('pegawai.nama')
+            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+            ->where('cuti_id', $idCuti)
+            ->where('role_approver', 'spv')
+            ->first();
+        $namaSpvDinamis = $spvLogData['nama'] ?? 'Supervisor';
+        ?>
+
+        <?php if (!empty($detailTeman)): ?>
+            <?php foreach ($detailTeman as $t): ?>
+                <?php
+                $statusSaran = strtolower($t['status'] ?? '');
+                if ($statusSaran === 'approved' || $statusSaran === 'approve'):
+                ?>
+                    <div class="timeline-item">
+                        <h4>TEMAN SEJAWAT</h4>
+                        <p>Status: <strong>APPROVED</strong></p>
+                        <p>Oleh: <strong><?= esc($t['nama'] ?? '-'); ?></strong></p>
+                        <p>Catatan: <strong>Disetujui Teman Sejawat</strong></p>
+                    </div>
+                <?php endif; ?>
             <?php endforeach; ?>
+        <?php endif; ?>
 
-            <?php if (!$hasVisibleTimeline): ?>
-                <p class="text-muted">Belum ada history approval yang divalidasi.</p>
-            <?php endif; ?>
-        <?php else: ?>
+        <?php
+        $spvLogData = $dbApproval->select('pegawai.nama')
+            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+            ->where('cuti_id', $idCuti)
+            ->where('role_approver', 'spv')
+            ->first();
+        $namaSpvDinamis = $spvLogData['nama'] ?? 'Supervisor';
+        ?>
+
+        <?php if (in_array($statusUtama, ['pending_hrd', 'pending_direktur', 'approve', 'approved', 'diterima'])): ?>
+            <div class="timeline-item">
+                <h4>SUPERVISOR</h4>
+                <p>Status: <strong>APPROVED</strong></p>
+                <p>Oleh: <strong><?= esc($namaSpvDinamis); ?></strong></p>
+                <p>Catatan: <strong>Disetujui oleh SPV</strong></p>
+            </div>
+        <?php elseif ($statusUtama === 'rejected' && $checkSpv && $checkSpv['status'] === 'rejected'): ?>
+            <div class="timeline-item">
+                <h4>SUPERVISOR</h4>
+                <p>Status: <strong>REJECTED</strong></p>
+                <p>Oleh: <strong><?= esc($namaSpvDinamis); ?></strong></p>
+                <p>Catatan: <strong><?= esc($checkSpv['catatan'] ?? 'Ditolak oleh SPV'); ?></strong></p>
+            </div>
+        <?php endif; ?>
+
+        <?php
+        $hrdLogData = $dbApproval->select('pegawai.nama')
+            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+            ->where('cuti_id', $idCuti)
+            ->where('role_approver', 'hrd')
+            ->first();
+
+        if (!empty($hrdLogData['nama'])) {
+            $namaHrdDinamis = $hrdLogData['nama'];
+        } else {
+            $searchHrd = array_filter($tracking, fn($t) => strtolower($t['level_approval'] ?? $t['role_approver'] ?? '') === 'hrd');
+            $hrdData = reset($searchHrd);
+            $namaHrdDinamis = !empty($hrdData['nama']) ? $hrdData['nama'] : 'HRD Team';
+        }
+        ?>
+
+        <?php if (in_array($statusUtama, ['pending_direktur', 'approve', 'approved', 'diterima'])): ?>
+            <div class="timeline-item">
+                <h4><?= strtoupper(esc($namaHrdDinamis)); ?></h4>
+                <p>Status: <strong>APPROVED</strong></p>
+                <p>Oleh: <strong><?= esc($namaHrdDinamis); ?></strong></p>
+                <p>Catatan: <strong>Disetujui oleh HRD</strong></p>
+            </div>
+        <?php elseif ($statusUtama === 'rejected' && $checkHrd && $checkHrd['status'] === 'rejected'): ?>
+            <div class="timeline-item">
+                <h4><?= strtoupper(esc($namaHrdDinamis)); ?></h4>
+                <p>Status: <strong>REJECTED</strong></p>
+                <p>Oleh: <strong><?= esc($namaHrdDinamis); ?></strong></p>
+                <p>Catatan: <strong><?= esc($checkHrd['catatan'] ?? 'Ditolak oleh HRD'); ?></strong></p>
+            </div>
+        <?php endif; ?>
+
+        <?php
+        $dirLogData = $dbApproval->select('pegawai.nama')
+            ->join('pegawai', 'pegawai.id = ' . $dbApproval->table . '.approver_id', 'left')
+            ->where('cuti_id', $idCuti)
+            ->where('role_approver', 'direktur')
+            ->first();
+
+        if (!empty($dirLogData['nama'])) {
+            $namaDirDinamis = $dirLogData['nama'];
+        } else {
+            $searchDir = array_filter($tracking, fn($t) => strtolower($t['level_approval'] ?? $t['role_approver'] ?? '') === 'direktur');
+            $dirData = reset($searchDir);
+            $namaDirDinamis = !empty($dirData['nama']) ? $dirData['nama'] : 'Direktur';
+        }
+        ?>
+
+        <?php if (in_array($statusUtama, ['approve', 'approved', 'diterima'])): ?>
+            <div class="timeline-item">
+                <h4><?= strtoupper(esc($namaDirDinamis)); ?></h4>
+                <p>Status: <strong>APPROVED</strong></p>
+                <p>Oleh: <strong><?= esc($namaDirDinamis); ?></strong></p>
+                <p>Catatan: <strong>Disetujui oleh Direktur</strong></p>
+            </div>
+        <?php elseif ($statusUtama === 'rejected' && $checkDir && $checkDir['status'] === 'rejected'): ?>
+            <div class="timeline-item">
+                <h4><?= strtoupper(esc($namaDirDinamis)); ?></h4>
+                <p>Status: <strong>REJECTED</strong></p>
+                <p>Oleh: <strong><?= esc($namaDirDinamis); ?></strong></p>
+                <p>Catatan: <strong><?= esc($checkDir['catatan'] ?? 'Ditolak oleh Direktur'); ?></strong></p>
+            </div>
+        <?php endif; ?>
+
+        <?php if (empty($temanApprovals) && $statusUtama === 'pending_teman'): ?>
             <p class="text-muted">Belum ada approval.</p>
         <?php endif; ?>
     </div>

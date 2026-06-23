@@ -247,7 +247,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>No</th>
                                 <th>Nama Pegawai</th>
                                 <th>Periode Cuti</th>
                                 <th>Total Hari</th>

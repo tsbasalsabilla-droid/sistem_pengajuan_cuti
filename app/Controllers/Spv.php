@@ -17,7 +17,6 @@ class Spv extends BaseController
     {
         $userId = session()->get('user')['id'];
 
-
         $data['cuti'] = $this->cutiModel
             ->select('pengajuan_cuti.*, pegawai.nama AS nama_pegawai')
             ->join('pegawai', 'pegawai.id = pengajuan_cuti.pegawai_id', 'left')
@@ -44,8 +43,8 @@ class Spv extends BaseController
             'cuti_id'       => $id,
             'approver_id'   => session()->get('user')['id'] ?? 0,
             'role_approver' => 'spv',
-            'status'        => 'rejected',
-            'catatan'       => 'Ditolak oleh SPV'
+            'status'        => 'approved',
+            'catatan'       => 'Disetujui oleh SPV'
         ]);
 
         return redirect()->to('/spv')->with('success', 'Pengajuan cuti disetujui!');
@@ -64,9 +63,11 @@ class Spv extends BaseController
 
         $approvalModel = new \App\Models\ApprovalModel();
         $approvalModel->save([
-            'cuti_id' => $id,
-            'role' => 'spv',
-            'action' => 'reject'
+            'cuti_id'       => $id,
+            'approver_id'   => session()->get('user')['id'] ?? 0,
+            'role_approver' => 'spv',
+            'status'        => 'rejected',
+            'catatan'       => 'Ditolak oleh SPV'
         ]);
 
         return redirect()->to('/spv')->with('success', 'Pengajuan cuti ditolak!');

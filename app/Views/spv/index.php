@@ -159,8 +159,8 @@
                                     ?>
                                 </td>
                                 <td>
-                                    <a href="/approval/approve-spv/<?= esc($item['id']); ?>" class="btn btn-success">Approve</a>
-                                    <a href="/approval/reject-spv/<?= esc($item['id']); ?>" class="btn btn-danger">Reject</a>
+                                    <a href="/approval/approve-spv/<?= esc($c['id']); ?>" class="btn btn-success">Approve</a>
+                                    <a href="/approval/reject-spv/<?= esc($c['id']); ?>" class="btn btn-danger">Reject</a>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

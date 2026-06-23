@@ -13,7 +13,6 @@ $routes->post('/auth/doLogin', 'Auth::doLogin');
 $routes->post('/auth/doRegister', 'Auth::doRegister');
 $routes->get('/logout', 'Auth::logout');
 
-
 $routes->get('/pegawai/dashboard', 'DashboardController::index');
 $routes->get('/dashboard', 'DashboardController::index');
 
@@ -30,7 +29,6 @@ $routes->post('/pegawai/cuti/approve/(:num)', 'CutiController::approve/$1');
 $routes->post('/cuti/approve/(:num)', 'CutiController::approve/$1');
 $routes->post('/pegawai/cuti/reject/(:num)', 'CutiController::reject/$1');
 $routes->post('/cuti/reject/(:num)', 'CutiController::reject/$1');
-
 
 $routes->get('/teman', 'CutiController::teman');
 
@@ -58,7 +56,6 @@ $routes->get('/approval/approve-spv/(:num)', 'Spv::approve/$1');
 $routes->post('/approval/reject-spv/(:num)', 'Spv::reject/$1');
 $routes->get('/approval', 'Spv::dashboard');
 $routes->get('/approval/index', 'Spv::dashboard');
-
 
 $routes->get('/hrd/dashboard', 'DashboardHrdController::index');
 $routes->get('/hrd', 'DashboardHrdController::index');
@@ -132,7 +129,6 @@ $routes->get('/hrd/laporan/exportExcel', 'LaporanController::exportExcel');
 $routes->get('laporan', 'LaporanController::index');
 $routes->get('laporan/delete/(:num)', 'LaporanController::delete/$1');
 $routes->get('laporan/exportExcel', 'LaporanController::exportExcel');
-
 
 $routes->get('/direktur', 'ApprovalController::index');
 $routes->get('/direktur/approve/(:num)', 'Direktur::approve/$1');
