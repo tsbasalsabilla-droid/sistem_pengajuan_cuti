@@ -1,0 +1,36 @@
+<?php
+
+declare(strict_types=1);
+
+
+
+namespace CodeIgniter\Honeypot\Exceptions;
+
+use CodeIgniter\Exceptions\ConfigException;
+
+class HoneypotException extends ConfigException
+{
+    
+    public static function forNoTemplate()
+    {
+        return new static(lang('Honeypot.noTemplate'));
+    }
+
+    
+    public static function forNoNameField()
+    {
+        return new static(lang('Honeypot.noNameField'));
+    }
+
+    
+    public static function forNoHiddenValue()
+    {
+        return new static(lang('Honeypot.noHiddenValue'));
+    }
+
+    
+    public static function isBot()
+    {
+        return new static(lang('Honeypot.theClientIsABot'));
+    }
+}
